@@ -1,14 +1,15 @@
 ---
-name: browser-qa-agent
+name: spectra-browser
 description: >-
-  World-Class Autonomous AI Playbook & Cognitive Reasoning Framework for Browser QA & Live Network Intelligence MCP Suite.
+  World-Class Autonomous AI Playbook & Cognitive Reasoning Framework for SpectraBrowser MCP Suite.
   Zero-hardcoding dynamic browser control, semantic DOM observation, full CDP network lifecycle instrumentation,
-  secret redaction, console error correlation, endpoint fingerprinting, schema drift detection, and evidence-backed QA audit reporting.
+  secret redaction, console error correlation, endpoint fingerprinting, schema drift detection, screen diagnosis,
+  smart waiting, human-in-the-loop interactive reasoning, and evidence-backed QA audit reporting.
 ---
 
-# 🛡️ Browser QA & Live Network Intelligence: Zero-Hardcoding Autonomous Playbook
+# 🌐 SpectraBrowser MCP: Autonomous Cognitive Agent Playbook
 
-This skill provides **rigorous, code-verified operational instructions** for any AI agent (**Antigravity, Claude 3.7, GPT-4o, DeepSeek-R1/V3, Qwen, Open WebUI**) to autonomously explore, interact with, debug, and audit web applications using the **Browser QA MCP Suite** (`browser-qa-mcp`).
+This skill provides **rigorous, code-verified operational instructions** for any AI agent (**Open WebUI, Antigravity, Claude 3.7, GPT-4o, DeepSeek-R1/V3, Qwen**) to autonomously explore, interact with, debug, and audit web applications using the **SpectraBrowser MCP Suite** (`spectra-browser-mcp`).
 
 Every capability is built upon dynamic accessibility tree observation and CDP network telemetry—**no hardcoded selectors, no brittle XPath, and no rigid test scripts**.
 
@@ -24,9 +25,12 @@ Every capability is built upon dynamic accessibility tree observation and CDP ne
 3. **Deterministic Human Auth Handoff (No Credential Scraping)**:
    - ❌ **NEVER** ask users for raw passwords or attempt to bypass Google SSO, 2FA, or CAPTCHA.
    - ✅ Call `session_create(browser_mode="headed")` and `session_pause(reason="User login required")`. Wait for the human to log in visibly in the browser window, then resume via `session_resume()`.
-4. **Automatic Secret Redaction**:
+4. **Interactive Human-in-the-Loop Protocol ("Pooch-Pooch Kar Karo")**:
+   - Before taking critical, ambiguous, or irreversible actions, call `session_ask_human(question="...", options=[...])`.
+   - Explain the current page state clearly to the human and await their decision before proceeding.
+5. **Automatic Secret Redaction**:
    - Telemetry automatically scrubs passwords, Bearer tokens, cookies, and sensitive keys across headers, URLs, payloads, and typed inputs.
-5. **Safety Guards for Destructive Actions**:
+6. **Safety Guards for Destructive Actions**:
    - Actions with keywords like `delete`, `remove`, `pay`, `purchase`, `cancel` are classified as `DESTRUCTIVE` and blocked unless `confirm_destructive=True`.
 
 ---
@@ -76,11 +80,11 @@ When an element is not immediately found or an unexpected modal/popup appears:
 
 ---
 
-## 🛠️ Complete Tool Specification (All 28 Tools)
+## 🛠️ Complete Tool Specification (All 31 Tools)
 
-### Group 1: Session Lifecycle & Human-in-the-Loop ("Puch Puch Kar Karo")
-* **`session_create(session_id, browser_mode="headless", target_origin=None, allowed_origins=[], profile_id=None)`**:
-  * Initializes browser context. Use `browser_mode="headed"` to open real visible browser window.
+### Group 1: Session Lifecycle & Human-in-the-Loop ("Pooch-Pooch Kar Karo")
+* **`session_create(session_id="default", browser_mode="headed", target_origin=None, allowed_origins=[], profile_id=None)`**:
+  * Initializes browser context. Use `browser_mode="headed"` to open visible Chrome window.
 * **`session_status(session_id="default")`**: Returns current session state (`active`, `paused`, `closed`).
 * **`session_ask_human(question, options=["Yes", "No"], context_summary="", session_id="default")`**:
   * 🤝 **Interactive Protocol:** Pauses execution to ask the human user a question or confirm an action before proceeding.
@@ -89,27 +93,29 @@ When an element is not immediately found or an unexpected modal/popup appears:
 * **`session_save(session_id="default", profile_id=None)`**: Persists authenticated cookies and localStorage to disk (`profiles/<id>/state/`).
 * **`session_close(session_id="default")`**: Closes browser context and frees memory cleanly.
 
-### Group 2: Semantic Inspection & Text Extraction
+### Group 2: Semantic Inspection & Screen Diagnosis
 * **`page_inspect(session_id="default")`**:
-  * Returns: `{ observation_id: "obs_...", title: "...", interactive_elements: [{"ref": "@1", "role": "button", "name": "Login"}, ...] }`.
-  * **Critical:** Use the returned `@ref` and `observation_id` for subsequent actions.
+  * Returns: `{ observation_id: "obs_...", title: "...", screen_diagnosis: {...}, interactive_elements: [{"ref": "@1", "role": "button", "name": "Login"}, ...] }`.
+  * **Critical:** Always inspect first. Use the returned `@ref` and `observation_id` for subsequent actions.
 * **`page_forms(session_id="default")`**: Extracts structured form fields, input types, values, and required constraints.
 * **`page_text(session_id="default", max_chars=3000)`**: Extracts clean, readable text without noisy HTML tags.
 
-### Group 3: Browser Interaction (Target by `@ref`)
+### Group 3: Browser Interaction & Smart Waiting
+* **`browser_navigate(url="...", session_id="default")`**: Navigates to target URL within allowed domain boundaries.
 * **`browser_click(target="@1", observation_id="obs_...", session_id="default", confirm_destructive=False)`**:
   * Clicks element by its semantic ref ID. Automatically correlates network and console events.
 * **`browser_type(target="@2", text="...", observation_id="obs_...", session_id="default")`**:
   * Types text into target input. Secrets are automatically redacted from logs.
 * **`browser_select(target="@3", option="...", observation_id="obs_...", session_id="default")`**: Selects dropdown value.
 * **`browser_scroll(direction="down", amount=500, session_id="default")`**: Smoothly scrolls the active viewport.
+* **`browser_press(key="Enter", session_id="default")`**: Presses keyboard keys (`Enter`, `Tab`, `Escape`, `Backspace`).
 * **`browser_wait(ms=1000, session_id="default")`**: Simple sleep timer for milliseconds.
 * **`browser_wait_for(target="@2"|"Generate", state="visible"|"hidden", timeout_ms=15000, session_id="default")`**:
   * ⏳ **Smart Dynamic Wait:** Waits until target element (@ref, text, button, or CSS selector) appears, disappears, or finishes generating.
 * **`browser_wait_idle(timeout_ms=10000, session_id="default")`**:
   * ⏳ **Network Settle:** Waits for in-flight network transactions and DOM mutations to completely settle.
 * **`browser_screenshot(session_id="default", full_page=True)`**:
-  * Saves high-resolution snapshot to `browser-qa-mcp/screenshots/` and returns `{ status, screenshot_path }`.
+  * Saves high-resolution snapshot to `screenshots/` and returns `{ status, screenshot_path }`.
 
 ### Group 4: Network & Console Intelligence
 * **`network_list(session_id="default", filter_type=None, status_code=None, limit=50)`**:
@@ -133,11 +139,11 @@ When an element is not immediately found or an unexpected modal/popup appears:
 
 ---
 
-## ⚡ Canonical Autonomous QA Recipes
+## ⚡ Canonical Autonomous Recipes
 
 ### Recipe 1: Full Automated Health & Performance Audit
 ```python
-# Step 1: Create session
+# Step 1: Create session in headless mode
 session_create(session_id="audit_run", browser_mode="headless")
 
 # Step 2: Navigate to target website
@@ -145,7 +151,6 @@ browser_navigate(url="https://app.example.com", session_id="audit_run")
 
 # Step 3: Inspect accessibility tree & discover elements
 obs = page_inspect(session_id="audit_run")
-# obs contains observation_id and list of elements [@1, @2, @3...]
 
 # Step 4: Capture full-page visual evidence
 shot = browser_screenshot(session_id="audit_run", full_page=True)
@@ -163,7 +168,7 @@ session_close(session_id="audit_run")
 
 ---
 
-### Recipe 2: Secure Headed Authentication Handoff (Human-in-the-Loop)
+### Recipe 2: Secure Headed Authentication & Persistent Profile Saving
 ```python
 # Step 1: Launch headed browser so user can see screen
 session_create(session_id="user_login", browser_mode="headed")
@@ -184,6 +189,36 @@ page_inspect(session_id="user_login")
 
 ---
 
+### Recipe 3: Interactive Generation / Form Fill ("Pooch-Pooch Kar Karo")
+```python
+# Step 1: Navigate & observe
+session_create(session_id="task_run", browser_mode="headed")
+browser_navigate(url="https://app.example.com/dashboard", session_id="task_run")
+obs = page_inspect(session_id="task_run")
+
+# Step 2: Check screen diagnosis
+diag = obs.get("screen_diagnosis", {})
+if diag.get("screen_type") == "cloudflare":
+    browser_wait(4000)
+    obs = page_inspect(session_id="task_run")
+
+# Step 3: Ask user before submitting
+session_ask_human(
+    question="Maine prompt enter kar diya hai. Kya mai 'Submit' button (@4) par click karun?",
+    options=["Haan, submit karo", "Text badal do", "Ruk jao"]
+)
+
+# Step 4: Upon confirmation, submit and wait dynamically
+session_resume(session_id="task_run", user_decision="Haan, submit karo")
+browser_click(target="@4", observation_id=obs["observation_id"], session_id="task_run")
+
+# Step 5: Smart dynamic wait for result to appear
+browser_wait_for(target="Download Image", state="visible", timeout_ms=30000, session_id="task_run")
+browser_screenshot(session_id="task_run", full_page=False)
+```
+
+---
+
 ## 🚫 Negative Constraints & Common Traps
 
 1. ❌ **NEVER use hardcoded CSS/XPath selectors** ➔ Always call `page_inspect()` and target `@1`, `@2`, `@3`.
@@ -191,3 +226,4 @@ page_inspect(session_id="user_login")
 3. ❌ **NEVER execute destructive actions without authorization** ➔ Buttons for deleting data or making payments require `confirm_destructive=True`.
 4. ❌ **NEVER leave headless browser sessions open** ➔ Always invoke `session_close(session_id)` to prevent memory leaks.
 5. ❌ **NEVER ask for raw credentials** ➔ For SSO / 2FA, use `session_create(browser_mode="headed")` and `session_pause()`.
+6. ❌ **NEVER blind-retry failed clicks** ➔ Re-inspect (`page_inspect()`), read `screen_diagnosis`, and ask the user (`session_ask_human()`).
