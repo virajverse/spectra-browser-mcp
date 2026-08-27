@@ -1,0 +1,15 @@
+{
+  "mcpServers": {
+    "browser-qa": {
+      "command": "python",
+      "args": [
+        "-m",
+        "browser_qa.server"
+      ],
+      "env": {
+        "PYTHONUNBUFFERED": "1",
+        "PYTHONPATH": "src"
+      }
+    }
+  }
+}

@@ -1,0 +1,24 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "spectra-browser-mcp"
+version = "1.0.0"
+description = "SpectraBrowser MCP: World-Class Autonomous Cognitive Browser & Network QA Suite"
+readme = "README.md"
+authors = [
+    { name = "Viraj Srivastav" }
+]
+keywords = ["mcp", "browser-automation", "playwright", "network-qa", "open-webui", "ai-agents"]
+requires-python = ">=3.10"
+dependencies = [
+    "playwright>=1.40.0",
+    "mcp>=1.0.0",
+    "fastapi>=0.100.0",
+    "uvicorn>=0.22.0",
+    "pydantic>=2.0.0",
+]
+
+[tool.setuptools.packages.find]
+where = ["src"]
