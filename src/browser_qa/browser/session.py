@@ -4,7 +4,7 @@ import time
 from typing import Dict, List, Optional, Tuple
 from urllib.parse import urlparse
 from browser_qa.models.session import (
-    BrowserMode, SessionConfig, SessionState, SessionStatus
+    BrowserMode, BrowserTarget, SessionConfig, SessionState, SessionStatus
 )
 from browser_qa.storage.filesystem import FileSystemStore
 
@@ -22,6 +22,9 @@ class SessionManager:
         self,
         session_id: str = "default",
         browser_mode: BrowserMode = BrowserMode.HEADED,
+        browser_target: BrowserTarget = BrowserTarget.MANAGED,
+        registration_id: Optional[str] = None,
+        tab_id: Optional[str] = None,
         target_origin: Optional[str] = None,
         allowed_origins: Optional[List[str]] = None,
         profile_id: Optional[str] = None,
@@ -39,6 +42,9 @@ class SessionManager:
         config = SessionConfig(
             session_id=session_id,
             browser_mode=browser_mode,
+            browser_target=browser_target,
+            registration_id=registration_id,
+            tab_id=tab_id,
             target_origin=self.get_origin(target_origin) if target_origin else None,
             allowed_origins=list(set(normalized_allowed)),
             profile_id=profile_id,
@@ -71,6 +77,10 @@ class SessionManager:
             self._pause_reasons[session_id] = None
             return True
         return False
+
+    def get_pause_reason(self, session_id: str) -> Optional[str]:
+        """Returns pause reason for session without exposing private _pause_reasons dict."""
+        return self._pause_reasons.get(session_id)
 
     def close_session(self, session_id: str) -> None:
         self._states[session_id] = SessionState.CLOSED

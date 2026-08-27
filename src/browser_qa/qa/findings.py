@@ -2,7 +2,7 @@
 
 import json
 import time
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Optional
 from browser_qa.evidence.manager import EvidenceManager
 from browser_qa.models.finding import AnomalyType, Finding, Severity
 from browser_qa.qa.detector import AnomalyDetector
@@ -14,10 +14,11 @@ from browser_qa.storage.interface import StorageInterface
 class FindingEngine:
     """Transforms raw anomalies and correlated flow events into evidence-backed findings."""
 
-    def __init__(self, storage: StorageInterface):
+    def __init__(self, storage: StorageInterface, perf_engine: Optional["PerformanceEngine"] = None):
         self.storage = storage
         self.detector = AnomalyDetector(storage)
-        self.perf_engine = PerformanceEngine(storage)
+        # FIX BUG-07: Reuse injected perf_engine if provided — avoids creating duplicate instance
+        self.perf_engine = perf_engine if perf_engine is not None else PerformanceEngine(storage)
 
     def synthesize_findings(self, session_id: str) -> List[Finding]:
         """Runs the lifecycle: Raw Events -> Anomalies -> Correlated Anomalies -> Findings."""

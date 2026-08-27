@@ -43,7 +43,42 @@ def test_session_create_tool_endpoint():
     client.post("/session_close", json={"session_id": "api_test"})
 
 
+def test_registration_endpoints_via_bridge():
+    # 1. Start registration
+    start_payload = {
+        "display_name": "OpenAPI Bridge Chrome",
+        "port": 9444
+    }
+    res = client.post("/browser_register_start", json=start_payload)
+    assert res.status_code == 200
+    data = res.json()
+    assert "registration_id" in data
+    reg_id = data["registration_id"]
+    assert data["display_name"] == "OpenAPI Bridge Chrome"
+    assert data["status"] in ("CONNECTED", "WAITING_FOR_USER", "REGISTERING")
+
+    # 2. List registrations
+    list_res = client.post("/browser_register_list", json={})
+    assert list_res.status_code == 200
+    regs = list_res.json()
+    assert any(r["registration_id"] == reg_id for r in regs)
+
+    # 3. Status
+    status_res = client.post("/browser_register_status", json={"registration_id": reg_id})
+    assert status_res.status_code == 200
+    status_data = status_res.json()
+    assert status_data["registration_id"] == reg_id
+
+    # 4. Revoke
+    rev_res = client.post("/browser_register_revoke", json={"registration_id": reg_id})
+    assert rev_res.status_code == 200
+    rev_data = rev_res.json()
+    assert rev_data["success"] is True
+    assert rev_data["status"] == "REVOKED"
+
+
 if __name__ == "__main__":
     test_bridge_root()
     test_session_create_tool_endpoint()
+    test_registration_endpoints_via_bridge()
     print("All OpenAPI bridge tests passed successfully! [PASSED]")

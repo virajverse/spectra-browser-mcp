@@ -111,4 +111,8 @@ class AnomalyDetector:
                     details={"location": con.location, "error_text": con.text}
                 ))
 
+        # FIX BUG-06: Persist anomalies to storage so list_anomalies() is no longer dead code
+        for anomaly in anomalies:
+            self.storage.add_anomaly(session_id, anomaly)
+
         return anomalies

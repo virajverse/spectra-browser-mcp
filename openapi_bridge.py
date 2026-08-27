@@ -1,7 +1,11 @@
 """OpenAPI Bridge Server exposing SpectraBrowser MCP capabilities to Open WebUI."""
 
+import inspect
 import sys
 from pathlib import Path
+from typing import Any
+
+from pydantic import create_model
 
 # Ensure spectra-browser-mcp src is in path
 CURRENT_DIR = Path(__file__).resolve().parent
@@ -15,34 +19,81 @@ from browser_qa.server import mcp
 
 app = FastAPI(
     title="SpectraBrowser MCP Tools",
-    description="OpenAPI Tool Server for Open WebUI exposing all 31 SpectraBrowser MCP capabilities",
+    description="OpenAPI Tool Server for Open WebUI exposing all SpectraBrowser MCP capabilities",
     version="1.0.0"
 )
 
-# Enable CORS so Open WebUI can connect without browser/network restrictions
+# ISSUE-12 FIX: allow_origins=["*"] + allow_credentials=True is a CORS spec violation
+# Browsers reject credentialed requests to wildcard origins.
+# For local Open WebUI usage, explicitly allow localhost origins.
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=[
+        "http://localhost",
+        "http://localhost:3000",
+        "http://localhost:8080",
+        "http://localhost:8081",
+        "http://127.0.0.1",
+        "http://127.0.0.1:3000",
+        "http://127.0.0.1:8080",
+        "http://127.0.0.1:8081",
+    ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-# Register all MCP tools directly with their actual parameter signatures
-for tool in mcp._tool_manager.list_tools():
+
+def register_tool_endpoint(tool):
+    fn = tool.fn
+    sig = inspect.signature(fn)
+    tool_name = tool.name
+
+    if not sig.parameters:
+        def no_param_handler():
+            return fn()
+        no_param_handler.__name__ = tool_name
+        app.post(
+            f"/{tool_name}",
+            summary=tool_name,
+            description=tool.description
+        )(no_param_handler)
+        return
+
+    fields = {}
+    for name, param in sig.parameters.items():
+        ann = param.annotation if param.annotation != inspect.Parameter.empty else Any
+        default = param.default if param.default != inspect.Parameter.empty else ...
+        fields[name] = (ann, default)
+
+    ReqModel = create_model(f"{tool_name}_Payload", **fields)
+
+    def param_handler(payload: ReqModel):
+        kwargs = payload.model_dump(exclude_unset=False)
+        filtered = {k: v for k, v in kwargs.items() if k in sig.parameters}
+        return fn(**filtered)
+
+    param_handler.__name__ = tool_name
     app.post(
-        f"/{tool.name}",
-        summary=tool.name,
+        f"/{tool_name}",
+        summary=tool_name,
         description=tool.description
-    )(tool.fn)
+    )(param_handler)
+
+
+# Register all MCP tools dynamically with typed request payload models
+for tool in mcp._tool_manager.list_tools():
+    register_tool_endpoint(tool)
 
 
 @app.get("/")
 def root():
+    tools = [t.name for t in mcp._tool_manager.list_tools()]
     return {
         "status": "online",
         "service": "SpectraBrowser OpenAPI Bridge",
-        "total_tools": len(mcp._tool_manager.list_tools())
+        "total_tools": len(tools),
+        "tools": tools
     }
 
 

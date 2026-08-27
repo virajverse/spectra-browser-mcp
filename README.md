@@ -67,7 +67,7 @@ python openapi_bridge.py
 1. Ensure the bridge is running (`python openapi_bridge.py` on port `8002`).
 2. In Open WebUI, navigate to **Admin Settings -> Tools -> Add Tool Server**.
 3. Enter URL: `http://127.0.0.1:8002/openapi.json`.
-4. All **31 tools** are now instantly available to your AI models!
+4. All **37 tools** are now instantly available to your AI models!
 
 ### 2. Antigravity / Claude Desktop (Native STDIO)
 Add to your `mcp_config.json`:
@@ -88,18 +88,31 @@ Add to your `mcp_config.json`:
 
 ---
 
-## 🛠️ Complete MCP Tool Catalog (31 Tools)
+## 🛠️ Complete MCP Tool Catalog (37 Tools)
+
+### 0. Chrome Extension Bridge & Personal Chrome Visible Control
+| Tool | Description |
+|---|---|
+| `extension_status` | Checks connection status of the SpectraBrowser Chrome Extension over local WebSocket (`ws://127.0.0.1:8765/extension_ws`). |
+| `browser_extract_images` | 📸 **High-Res Media Extraction:** Extracts raw, full-resolution image files directly from DOM/CDN without viewport cropping. Ready for instant Supabase / CMS upload! |
+| `browser_register_start` | Initiates explicit personal Chrome browser registration via CDP. |
+| `browser_register_status` | Returns registration state, CDP health, and safe profile metadata (no secrets/passwords). |
+| `browser_register_confirm` | Verifies live CDP endpoint reachability and Playwright attachment, marking status `CONNECTED`. |
+| `browser_register_revoke` | Explicitly revokes registered browser access, stops automation, and releases all telemetry collection. |
+| `browser_register_list` | Lists all registered browsers and persistent configuration metadata. |
+| `browser_tabs` | Enumerates open tabs in the registered Chrome context with safe metadata (`tab_id`, `title`, `origin`, `active`). |
+| `browser_select_tab` | Selects an open tab in user's Chrome as the active QA target, attaches network/console listeners, and brings it to front. |
 
 ### 1. Session Lifecycle & Human-in-the-Loop
 | Tool | Description |
 |---|---|
-| `session_create` | Initializes isolated browser context (supports `headed` mode for manual login). |
-| `session_status` | Returns session lifecycle state (`active`, `paused`), URL, and transaction telemetry. |
+| `session_create` | Initializes browser session. Supports `browser_target="registered"` for personal Chrome or `browser_target="managed"` for isolated Playwright. |
+| `session_status` | Returns session lifecycle state (`active`, `paused`), URL, `browser_target`, and transaction telemetry. |
 | `session_ask_human` | 🤝 **Interactive Protocol:** Pauses execution to ask user instructions or choices before acting. |
 | `session_pause` | Pauses automation so human can complete manual login, 2FA, or CAPTCHA. |
 | `session_resume` | Resumes agent automation with optional user decision recorded in telemetry. |
 | `session_save` | Persists browser storage state (cookies & localStorage) to `profiles/<id>/state/`. |
-| `session_close` | Cleanly closes browser context and releases memory. |
+| `session_close` | Cleanly closes session. For registered Chrome, detaches without closing the user's browser. |
 
 ### 2. Browser Interaction & Smart Waiting
 | Tool | Description |
@@ -122,14 +135,13 @@ Add to your `mcp_config.json`:
 | `page_forms` | Returns detected forms, inputs, types, placeholders, and current values. |
 | `page_text` | Extracts clean, human-readable text summary of the page. |
 
-### 4. Full-Spectrum Network Telemetry
+### 4. Chrome DevTools Network Tab Mirroring Engine
 | Tool | Description |
 |---|---|
-| `network_stream` | Consumes real-time event stream from the per-session ring buffer. |
-| `network_list` | Lists captured HTTP transactions with method, URL, status, and latency. |
-| `network_get` | Retrieves full redacted transaction details (headers, payload, response, timing breakdown). |
-| `network_summary` | Returns endpoint latency percentiles (P50, P95), error distributions, and duplicate call flags. |
-| `network_clear` | Clears captured transactions and resets stream cursor. |
+| `network_list` | 📊 **1:1 DevTools Table:** Lists captured requests with columns: `Name`, `Status`, `Type`, `Initiator` (with script line), `Size`, `Time`. Supports filters (`Fetch/XHR`, `Doc`, `CSS`, `JS`, `Img`), `errors_only=True`, and query search. |
+| `network_get` | 🔍 **5 DevTools Sub-Tabs:** Retrieves exact Headers, Preview, Response body, Initiator call stack, and Timing waterfall (queued, stalled, DNS, TLS, TTFB, download). |
+| `network_summary` | 📈 Returns DevTools bottom summary string: `204 requests | 138 kB transferred | 7.5 MB resources | Finish: 4.94 s`. |
+| `network_clear` | Clears captured transactions and resets buffer. |
 
 ### 5. Console & Real-time Streams
 | Tool | Description |
@@ -138,12 +150,18 @@ Add to your `mcp_config.json`:
 | `websocket_list` | Lists active WebSocket connections, handshake status, and frame metrics. |
 | `sse_list` | Lists active Server-Sent Events (SSE) streams and captured event payloads. |
 
-### 6. QA Intelligence & Reporting
+### 6. QA Intelligence & Evidence Engine
 | Tool | Description |
 |---|---|
 | `qa_anomalies` | Scans for HTTP 5xx, CORS failures, tail latency spikes (>3s), and JS errors. |
 | `qa_correlate` | Returns `FlowEvent` linking specific user action to triggered network calls and errors. |
 | `qa_report` | Compiles an evidence-backed QA audit report with reproduction steps and performance stats. |
+
+### 7. System Storage Audit & Deep Cache Purge
+| Tool | Description |
+|---|---|
+| `check_mcp_storage` | 📊 Scans and itemizes disk space consumed by screenshots, extracted raw images, and compiler caches across all MCPs. |
+| `clean_mcp_storage` | 🧹 Safely purges temporary images, screenshots, and compiler bytecode on explicit user request. |
 
 ---
 

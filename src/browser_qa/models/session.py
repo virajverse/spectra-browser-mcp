@@ -11,6 +11,11 @@ class BrowserMode(str, Enum):
     HEADLESS = "headless"
 
 
+class BrowserTarget(str, Enum):
+    REGISTERED = "registered"
+    MANAGED = "managed"
+
+
 class SessionState(str, Enum):
     INITIALIZING = "initializing"
     AUTHENTICATING = "authenticating"
@@ -22,6 +27,9 @@ class SessionState(str, Enum):
 class SessionConfig(BaseModel):
     session_id: str = "default"
     browser_mode: BrowserMode = BrowserMode.HEADED
+    browser_target: BrowserTarget = BrowserTarget.MANAGED
+    registration_id: Optional[str] = None
+    tab_id: Optional[str] = None
     target_origin: Optional[str] = None
     allowed_origins: List[str] = Field(default_factory=list)
     profile_id: Optional[str] = None
@@ -34,6 +42,9 @@ class SessionStatus(BaseModel):
     session_id: str
     state: SessionState
     browser_mode: BrowserMode
+    browser_target: BrowserTarget = BrowserTarget.MANAGED
+    registration_id: Optional[str] = None
+    tab_id: Optional[str] = None
     current_url: str = ""
     title: str = ""
     target_origin: Optional[str] = None

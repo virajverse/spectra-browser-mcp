@@ -1,41 +1,30 @@
-"""File-system persistent storage for client profiles and screenshots."""
+"""File-system and memory storage for screenshots and session states."""
 
 import json
 from pathlib import Path
 from typing import Any, Dict, Optional
-from browser_qa.config import PROFILES_DIR, EVIDENCE_DIR, SCREENSHOTS_DIR
+from browser_qa.config import SCREENSHOTS_DIR
 
 
 class FileSystemStore:
-    """Manages persistent browser profiles and disk evidence storage."""
+    """Manages screenshots on disk and session storage states cleanly in memory."""
 
-    @staticmethod
-    def get_profile_state_path(profile_id: str) -> Path:
-        profile_path = PROFILES_DIR / profile_id / "state"
-        profile_path.mkdir(parents=True, exist_ok=True)
-        return profile_path / "storage_state.json"
+    _in_memory_states: Dict[str, Dict[str, Any]] = {}
 
     @classmethod
     def save_profile_state(cls, profile_id: str, state: Dict[str, Any]) -> str:
-        file_path = cls.get_profile_state_path(profile_id)
-        with open(file_path, "w", encoding="utf-8") as f:
-            json.dump(state, f, indent=2)
-        return str(file_path)
+        """Saves browser session storage state in memory without creating profile folders."""
+        cls._in_memory_states[profile_id] = state
+        return f"memory://profiles/{profile_id}/state"
 
     @classmethod
     def load_profile_state(cls, profile_id: str) -> Optional[Dict[str, Any]]:
-        file_path = cls.get_profile_state_path(profile_id)
-        if not file_path.exists():
-            return None
-        try:
-            with open(file_path, "r", encoding="utf-8") as f:
-                return json.load(f)
-        except Exception:
-            return None
+        """Loads browser session storage state from memory."""
+        return cls._in_memory_states.get(profile_id)
 
     @classmethod
     def profile_exists(cls, profile_id: str) -> bool:
-        return cls.get_profile_state_path(profile_id).exists()
+        return profile_id in cls._in_memory_states
 
     @staticmethod
     def get_screenshot_path(session_id: str, filename: str) -> Path:

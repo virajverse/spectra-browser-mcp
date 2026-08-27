@@ -114,7 +114,7 @@ class PageObserver:
             });
 
             // Forms
-            document.querySelectorAll('forms, form').forEach((f, fIdx) => {
+            document.querySelectorAll('form').forEach((f, fIdx) => {
                 const formInputs = [];
                 f.querySelectorAll('input, select, textarea').forEach(inp => {
                     formInputs.push({

@@ -46,13 +46,51 @@ class MemoryStore(StorageInterface):
         session_id: str,
         limit: int = 50,
         status_code: Optional[int] = None,
-        filter_type: Optional[str] = None
+        filter_type: Optional[str] = None,
+        errors_only: bool = False,
+        search_query: Optional[str] = None
     ) -> List[NetworkTransaction]:
         txs = list(self._transactions[session_id])
+
+        # Filter by status code
         if status_code is not None:
             txs = [t for t in txs if t.response and t.response.status == status_code]
-        if filter_type is not None:
-            txs = [t for t in txs if t.request.resource_type.lower() == filter_type.lower()]
+
+        # Filter by errors only (4xx, 5xx, or failed)
+        if errors_only:
+            txs = [t for t in txs if (t.response and t.response.status >= 400) or t.failure_reason]
+
+        # Filter by DevTools search query
+        if search_query:
+            q = search_query.lower()
+            txs = [t for t in txs if q in t.request.url.lower() or q in t.name.lower()]
+
+        # Filter by DevTools category (Fetch/XHR, Doc, CSS, JS, Font, Img, Media, Socket, Wasm)
+        if filter_type and filter_type.lower() != "all":
+            ft = filter_type.lower()
+            if ft in ("fetch/xhr", "fetch", "xhr"):
+                txs = [t for t in txs if t.request.resource_type in ("fetch", "xhr", "xmlhttprequest")]
+            elif ft in ("doc", "document"):
+                txs = [t for t in txs if t.request.resource_type in ("document", "doc")]
+            elif ft in ("css", "stylesheet"):
+                txs = [t for t in txs if t.request.resource_type in ("stylesheet", "css")]
+            elif ft in ("js", "script"):
+                txs = [t for t in txs if t.request.resource_type in ("script", "js")]
+            elif ft in ("font", "fonts"):
+                txs = [t for t in txs if t.request.resource_type in ("font", "fonts")]
+            elif ft in ("img", "image", "images"):
+                txs = [t for t in txs if t.request.resource_type in ("image", "img", "png", "jpeg", "webp", "gif", "svg")]
+            elif ft in ("media", "video", "audio"):
+                txs = [t for t in txs if t.request.resource_type in ("media", "video", "audio")]
+            elif ft in ("socket", "websocket"):
+                txs = [t for t in txs if t.request.resource_type in ("websocket", "socket")]
+            elif ft in ("wasm",):
+                txs = [t for t in txs if t.request.resource_type in ("wasm",)]
+            elif ft in ("manifest",):
+                txs = [t for t in txs if t.request.resource_type in ("manifest",)]
+            else:
+                txs = [t for t in txs if t.request.resource_type == ft]
+
         return txs[-limit:]
 
     def clear_transactions(self, session_id: str) -> None:

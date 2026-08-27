@@ -37,7 +37,11 @@ class NetworkCollector:
 
         # Sanitize headers & post_data
         headers = redact_headers(dict(request.headers))
-        raw_post = request.post_data
+        # FIX: request.post_data can raise UnicodeDecodeError for binary payloads (gzip, protobuf etc)
+        try:
+            raw_post = request.post_data
+        except Exception:
+            raw_post = None
         post_data = redact_body_string(raw_post) if raw_post else None
 
         req_data = RequestData(
@@ -98,14 +102,25 @@ class NetworkCollector:
         try:
             raw_timing = response.request.timing
             if raw_timing and isinstance(raw_timing, dict):
+                # FIX BUG-10: Playwright timing fields are absolute offsets from navigation start (ms),
+                # NOT durations. Must compute deltas to get actual phase durations.
+                dns_start = raw_timing.get("domainLookupStart", -1)
+                dns_end = raw_timing.get("domainLookupEnd", -1)
+                conn_start = raw_timing.get("connectStart", -1)
+                conn_end = raw_timing.get("connectEnd", -1)
+                tls_start = raw_timing.get("secureConnectionStart", -1)
+                req_start = raw_timing.get("requestStart", -1)
+                res_start = raw_timing.get("responseStart", -1)
+                res_end = raw_timing.get("responseEnd", -1)
+
                 timing_data = TimingData(
-                    dns_ms=raw_timing.get("domainLookupEnd", 0) - raw_timing.get("domainLookupStart", 0),
-                    connect_ms=raw_timing.get("connectEnd", 0) - raw_timing.get("connectStart", 0),
-                    tls_ms=raw_timing.get("secureConnectionStart", 0),
-                    request_ms=raw_timing.get("requestStart", 0),
-                    ttfb_ms=raw_timing.get("responseStart", 0),
-                    download_ms=raw_timing.get("responseEnd", 0) - raw_timing.get("responseStart", 0),
-                    total_ms=raw_timing.get("responseEnd", 0)
+                    dns_ms=max(0.0, dns_end - dns_start) if dns_start >= 0 and dns_end >= 0 else 0.0,
+                    connect_ms=max(0.0, conn_end - conn_start) if conn_start >= 0 and conn_end >= 0 else 0.0,
+                    tls_ms=max(0.0, conn_end - tls_start) if tls_start > 0 and conn_end >= 0 else 0.0,
+                    request_ms=max(0.0, res_start - req_start) if req_start >= 0 and res_start >= 0 else 0.0,
+                    ttfb_ms=max(0.0, res_start - req_start) if req_start >= 0 and res_start >= 0 else 0.0,
+                    download_ms=max(0.0, res_end - res_start) if res_start >= 0 and res_end >= 0 else 0.0,
+                    total_ms=max(0.0, res_end - req_start) if req_start >= 0 and res_end >= 0 else 0.0,
                 )
         except Exception:
             pass

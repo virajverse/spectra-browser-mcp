@@ -6,13 +6,11 @@ from pathlib import Path
 # Paths
 MODULE_DIR = Path(__file__).resolve().parent
 PROJECT_ROOT = MODULE_DIR.parent.parent
-PROFILES_DIR = PROJECT_ROOT / "profiles"
-EVIDENCE_DIR = PROJECT_ROOT / "evidence_store"
 SCREENSHOTS_DIR = PROJECT_ROOT / "screenshots"
-
-PROFILES_DIR.mkdir(parents=True, exist_ok=True)
-EVIDENCE_DIR.mkdir(parents=True, exist_ok=True)
 SCREENSHOTS_DIR.mkdir(parents=True, exist_ok=True)
+
+# Registrations are in-memory by default (no unwanted profiles folder)
+REGISTRATIONS_FILE = None
 
 # Ring buffer & limits
 RING_BUFFER_MAX_SIZE = 1000
