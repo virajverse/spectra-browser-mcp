@@ -144,4 +144,4 @@ python tests/test_bridge.py      # OpenAPI bridge test
 ---
 
 ## 📄 License
-MIT License © 2026 Viraj Srivastav / [Taliyo Technologies](https://taliyotechnologies.com)
+MIT License © 2026 VirajVerse (https://github.com/virajverse)

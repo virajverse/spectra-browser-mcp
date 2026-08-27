@@ -8,7 +8,7 @@ version = "1.0.0"
 description = "SpectraBrowser MCP: World-Class Autonomous Cognitive Browser & Network QA Suite"
 readme = "README.md"
 authors = [
-    { name = "Viraj Srivastav" }
+    { name = "VirajVerse", url = "https://github.com/virajverse" }
 ]
 keywords = ["mcp", "browser-automation", "playwright", "network-qa", "open-webui", "ai-agents"]
 requires-python = ">=3.10"
