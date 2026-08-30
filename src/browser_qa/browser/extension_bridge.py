@@ -46,7 +46,12 @@ class ExtensionBridge:
         async def _main():
             import websockets
             try:
-                async with websockets.serve(self._handle_client, self.host, self.port):
+                async with websockets.serve(
+                    self._handle_client, 
+                    self.host, 
+                    self.port,
+                    max_size=100 * 1024 * 1024
+                ):
                     await asyncio.Future()
             except Exception as e:
                 pass
@@ -112,7 +117,7 @@ class ExtensionBridge:
     def _handle_cdp_telemetry(self, method: str, params: Dict[str, Any], session_id: str = "default"):
         """Pipes live Chrome DevTools telemetry directly into the QA MemoryStore with redaction."""
         try:
-            from browser_qa.models.network import NetworkTransaction, RequestData, ResponseData
+            from browser_qa.models.network import NetworkTransaction, RequestData, ResponseData, TimingData
             from browser_qa.models.flow import ConsoleEvent
             from browser_qa.processors.redactor import Redactor
 
@@ -311,7 +316,7 @@ class ExtensionBridge:
                 )
                 self.storage.add_console_event(session_id, con)
         except Exception as e:
-            pass
+            print(f"[ExtensionBridge] Telemetry parsing error: {e}")
 
     def is_connected(self) -> bool:
         """Returns True if Chrome extension is actively connected."""
@@ -358,6 +363,7 @@ class ExtensionBridge:
                 input_type=el.get("type") or None,
                 is_visible=True,
                 is_enabled=True,
+                attributes=el.get("attributes", {}),
                 bounding_box=el.get("rect", {})
             ))
 
@@ -384,33 +390,100 @@ class ExtensionBridge:
         )
         return obs
 
+    def navigate(self, url: str) -> Dict[str, Any]:
+        """Navigates the active Chrome tab to a URL."""
+        return self.send_command_sync("navigate", {"url": url}, timeout=15.0)
+
+    def reload(self, ignore_cache: bool = True) -> Dict[str, Any]:
+        """Reloads the active Chrome tab with DevTools Network and Console telemetry enabled."""
+        return self.send_command_sync("reload", {"ignore_cache": ignore_cache}, timeout=20.0)
+
     def click(self, target: str) -> Dict[str, Any]:
-        """Clicks an element by @ref or CSS selector."""
+        """Clicks an element by @ref, CSS selector, or accessible name."""
         return self.send_command_sync("click", {"target": target}, timeout=10.0)
 
-    def type(self, target: str, value: str) -> Dict[str, Any]:
-        """Types text into an element by @ref or CSS selector."""
-        return self.send_command_sync("type", {"target": target, "value": value}, timeout=10.0)
+    def type(self, target: str, value: str, clear: bool = False) -> Dict[str, Any]:
+        """Types text into an element with React/Vue input setter and optional clear."""
+        return self.send_command_sync("type", {"target": target, "value": value, "clear": clear}, timeout=10.0)
 
-    def screenshot(self, session_id: str = "default") -> str:
-        """Captures screenshot of the active Chrome tab and saves to disk."""
+    def select(self, target: str, option: str) -> Dict[str, Any]:
+        """Selects an option in a dropdown or combobox."""
+        return self.send_command_sync("select", {"target": target, "option": option}, timeout=10.0)
+
+    def scroll(self, direction: str = "down", amount: int = 600, target: Optional[str] = None) -> Dict[str, Any]:
+        """Scrolls active tab viewport or scrolls a target element into view."""
+        return self.send_command_sync("scroll", {"direction": direction, "amount": amount, "target": target}, timeout=10.0)
+
+    def press_key(self, key: str = "Enter") -> Dict[str, Any]:
+        """Dispatches a keyboard key event (e.g. Enter, Escape, Tab) to the focused element."""
+        return self.send_command_sync("press_key", {"key": key}, timeout=10.0)
+
+    def wait_for(self, target: str, state: str = "visible", timeout_ms: int = 15000) -> Dict[str, Any]:
+        """Waits dynamically for target element to become visible, hidden, or attached."""
+        return self.send_command_sync("wait_for", {"target": target, "state": state, "timeout_ms": timeout_ms}, timeout=(timeout_ms / 1000.0) + 5.0)
+
+    def wait_idle(self, timeout_ms: int = 10000) -> Dict[str, Any]:
+        """Waits for DOM mutations and network activity to settle."""
+        return self.send_command_sync("wait_idle", {"timeout_ms": timeout_ms}, timeout=(timeout_ms / 1000.0) + 5.0)
+
+    def screenshot(
+        self,
+        session_id: str = "default",
+        save_to_disk: bool = False,
+        return_base64: bool = True
+    ) -> Dict[str, Any]:
+        """Captures screenshot with Pure In-Memory Ephemeral Stream (0 hard disk usage by default).
+        
+        Args:
+            session_id: Session identifier
+            save_to_disk: If True, writes to disk with Rolling Ring Buffer (Max 2 files). Defaults to False (0 disk usage).
+            return_base64: If True, returns in-memory base64 data URI for AI Agent Multimodal Vision. Defaults to True.
+        """
         data = self.send_command_sync("screenshot", timeout=10.0)
         data_url = data.get("dataUrl", "")
         if not data_url or "," not in data_url:
             raise RuntimeError("Invalid screenshot data returned from extension.")
 
         base64_data = data_url.split(",", 1)[1]
-        img_bytes = base64.b64decode(base64_data)
+        size_bytes = int(len(base64_data) * 0.75)
+        size_kb = round(size_bytes / 1024, 2)
 
-        target_dir = SCREENSHOTS_DIR / session_id
-        target_dir.mkdir(parents=True, exist_ok=True)
-        filename = f"scr_ext_{session_id}_{int(time.time())}.png"
-        filepath = target_dir / filename
+        filepath_str = None
 
-        with open(filepath, "wb") as f:
-            f.write(img_bytes)
+        if save_to_disk:
+            img_bytes = base64.b64decode(base64_data)
+            target_dir = SCREENSHOTS_DIR / session_id
+            target_dir.mkdir(parents=True, exist_ok=True)
 
-        return str(filepath)
+            # Rolling Ring Buffer: Keep max 2 screenshot files in target_dir
+            existing = sorted(list(target_dir.glob("scr_ext_*.png")), key=lambda p: p.stat().st_mtime)
+            while len(existing) >= 2:
+                oldest = existing.pop(0)
+                try:
+                    oldest.unlink()
+                except Exception:
+                    pass
+
+            filename = f"scr_ext_{session_id}_{int(time.time())}.png"
+            filepath = target_dir / filename
+            with open(filepath, "wb") as f:
+                f.write(img_bytes)
+            filepath_str = str(filepath)
+
+        return {
+            "status": "success",
+            "mode": "in_memory_ephemeral" if not save_to_disk else "disk_buffered",
+            "disk_usage_bytes": 0 if not save_to_disk else size_bytes,
+            "size_kb": size_kb,
+            "format": "PNG",
+            "file_path": filepath_str,
+            "base64": data_url if return_base64 else None,
+            "instructions": (
+                "Screenshot captured purely in memory (0 disk bytes used). Agent can visually inspect 'base64' directly."
+                if not save_to_disk else
+                f"Screenshot saved with Rolling Buffer to '{filepath_str}'"
+            )
+        }
 
     def list_tabs(self) -> List[Dict[str, Any]]:
         """Lists all open tabs in user's Chrome."""
@@ -424,11 +497,11 @@ class ExtensionBridge:
         """Detaches from the currently attached tab."""
         return self.send_command_sync("detach_tab", timeout=5.0)
 
-    def press_key(self, key: str = "Enter") -> Dict[str, Any]:
-        """Dispatches a keyboard key event (e.g. Enter) to the focused element."""
-        return self.send_command_sync("press_key", {"key": key}, timeout=10.0)
-
     def extract_images(self) -> List[Dict[str, Any]]:
         """Extracts all full-resolution images from the page with base64 data."""
-        return self.send_command_sync("extract_images", timeout=25.0)
+        return self.send_command_sync("extract_images", timeout=120.0)
+
+    def execute_cdp(self, method: str, params: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
+        """Executes a raw Chrome DevTools Protocol command."""
+        return self.send_command_sync("cdp_command", {"method": method, "params": params or {}}, timeout=15.0)
 

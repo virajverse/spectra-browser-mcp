@@ -100,3 +100,36 @@ def redact_action_value(target: str, value: Union[str, None]) -> Union[str, None
     if any(s in lower_target for s in ("password", "passwd", "token", "otp", "pin", "cvv", "secret", "card")):
         return "[REDACTED]"
     return value
+
+
+class Redactor:
+    """Class wrapper providing static redaction methods for CDP telemetry and actions."""
+
+    @staticmethod
+    def redact_headers(headers: Dict[str, str]) -> Dict[str, str]:
+        return redact_headers(headers)
+
+    @staticmethod
+    def redact_url(url: str) -> str:
+        if not url:
+            return ""
+        pattern = re.compile(r"([?&](?:token|auth|key|secret|password|sig|signature|access_token)=)([^&]+)", re.IGNORECASE)
+        return pattern.sub(r"\1[REDACTED]", url)
+
+    @staticmethod
+    def redact_data(data: Any) -> Any:
+        return redact_data(data)
+
+    @staticmethod
+    def redact_body_string(body: Union[str, None]) -> Union[str, None]:
+        return redact_body_string(body)
+
+    @staticmethod
+    def redact_text(text: Union[str, None]) -> Union[str, None]:
+        if not text:
+            return text
+        return JWT_REGEX.sub("[REDACTED_JWT]", str(text))
+
+    @staticmethod
+    def redact_action_value(target: str, value: Union[str, None]) -> Union[str, None]:
+        return redact_action_value(target, value)

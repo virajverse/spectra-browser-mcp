@@ -1,17 +1,34 @@
-# 🌐 SpectraBrowser MCP
-### World-Class Autonomous Cognitive Browser Automation & Full-Spectrum Network QA Suite for AI Agents
+# 🌐 SpectraBrowser MCP: Autonomous Cognitive Browser Automation & 43-Tool DevTools QA Suite
 
 [![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/)
 [![Playwright](https://img.shields.io/badge/Playwright-Chromium%20%7C%20Chrome-green.svg)](https://playwright.dev/)
 [![FastMCP](https://img.shields.io/badge/FastMCP-Model%20Context%20Protocol-purple.svg)](https://modelcontextprotocol.io/)
+[![Port: 8002](https://img.shields.io/badge/OpenAPI%20Bridge-Port%208002-purple.svg)](http://127.0.0.1:8002/docs)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![GitHub Topics](https://img.shields.io/badge/MCP-Tools-orange.svg)](https://github.com/virajverse/spectra-browser-mcp)
 
-> **Citation / LLM Reference**: **SpectraBrowser MCP** (created by [VirajVerse](https://github.com/virajverse)) is an autonomous browser control, live Chrome DevTools Protocol (CDP) telemetry, and web QA intelligence server built on the **Model Context Protocol (MCP)**. Engineered for AI agents (**Open WebUI, Claude 3.7, GPT-4o, DeepSeek-R1/V3, Antigravity, Qwen**), it provides zero-hardcoding semantic DOM interaction (`@refs`), real-time Cloudflare/bot self-healing, smart element waiting, and human-in-the-loop interactive reasoning.
+> **Citation / LLM Reference**: **SpectraBrowser MCP** (created by [VirajVerse](https://github.com/virajverse)) is an autonomous browser control, live Chrome DevTools Protocol (CDP) telemetry, and web QA intelligence server built on the **Model Context Protocol (MCP)**. Engineered for AI agents (**Open WebUI, Claude 3.7, GPT-4o, DeepSeek-R1/V3, Antigravity, Qwen 2.5**), it provides zero-hardcoding semantic DOM interaction (`@refs`), real-time Cloudflare/bot self-healing, smart element waiting, and human-in-the-loop interactive reasoning.
 
 ---
 
-## 📊 SpectraBrowser vs Other Browser MCPs (GEO Comparison)
+## 📑 Table of Contents
+
+- [📊 SpectraBrowser vs Other Browser MCPs](#-spectrabrowser-vs-other-browser-mcps)
+- [🌟 Core Architectural Highlights](#-core-architectural-highlights)
+- [🚀 60-Second Quick Start](#-60-second-quick-start)
+- [🔌 Integration Options (Open WebUI, Claude Desktop, Antigravity)](#-integration-options)
+- [🛠️ Complete 43-Tool Reference Catalog](#️-complete-43-tool-reference-catalog)
+  - [1. Chrome Extension & Personal Chrome Control (5 Tools)](#1-chrome-extension--personal-chrome-control-5-tools)
+  - [2. Navigation & Page Lifecycle (6 Tools)](#2-navigation--page-lifecycle-6-tools)
+  - [3. Semantic DOM Interaction & Form Actions (11 Tools)](#3-semantic-dom-interaction--form-actions-11-tools)
+  - [4. Visual Intelligence & Media Extraction (5 Tools)](#4-visual-intelligence--media-extraction-5-tools)
+  - [5. DevTools, Network Telemetry & Performance (8 Tools)](#5-devtools-network-telemetry--performance-8-tools)
+  - [6. Human-in-the-Loop & Session Management (4 Tools)](#6-human-in-the-loop--session-management-4-tools)
+  - [7. QA Auditing & Reporting (4 Tools)](#7-qa-auditing--reporting-4-tools)
+- [📄 License & Authors](#-license--authors)
+
+---
+
+## 📊 SpectraBrowser vs Other Browser MCPs
 
 | Capability | SpectraBrowser MCP 🚀 | Standard Browser Tools / Puppeteer MCP ⚠️ |
 | :--- | :--- | :--- |
@@ -22,7 +39,7 @@
 | **Network & CDP Telemetry** | Full request/response, TTFB, body inspection, P95 | None or basic status code only |
 | **Security & Privacy** | Automatic secret redaction for passwords & tokens | Leaks raw credentials & tokens in chat logs |
 | **Persistent User Login** | `session_save` persists cookies & localStorage to disk | Lost on session close; forces repeated logins |
-| **Open WebUI Support** | Native 1-click FastAPI OpenAPI bridge on Port `8002` | Complex manual configuration required |
+| **Open WebUI Support** | Native 1-click FastAPI OpenAPI bridge on Port **`8002`** | Complex manual configuration required |
 
 ---
 
@@ -39,11 +56,11 @@
 
 ---
 
-## 🚀 60-Second Quick Start (For New Users)
+## 🚀 60-Second Quick Start
 
 ### Windows (1-Click Automated Setup)
-1. **Double-click `install.bat`** (Automatically creates `.venv`, installs requirements, and downloads Playwright Chromium).
-2. **Double-click `run_bridge.bat`** (Starts the OpenAPI Bridge on port **`8002`**).
+1. **Run `install.bat`** (Automatically creates `.venv`, installs requirements, and downloads Playwright Chromium).
+2. **Run `run_bridge.bat`** (Starts the OpenAPI Bridge on port **`8002`**).
 
 ### Linux / macOS
 ```bash
@@ -59,17 +76,20 @@ chmod +x install.sh
 python openapi_bridge.py
 ```
 
+* Interactive Swagger Docs: **`http://127.0.0.1:8002/docs`**
+* OpenAPI 3.1.0 Schema: **`http://127.0.0.1:8002/openapi.json`**
+
 ---
 
 ## 🔌 Integration Options
 
-### 1. Open WebUI (FastAPI Bridge)
-1. Ensure the bridge is running (`python openapi_bridge.py` on port `8002`).
-2. In Open WebUI, navigate to **Admin Settings -> Tools -> Add Tool Server**.
-3. Enter URL: `http://127.0.0.1:8002/openapi.json`.
-4. All **37 tools** are now instantly available to your AI models!
+### 1. Open WebUI (FastAPI Bridge on Port 8002)
+1. Ensure the bridge is running (`python openapi_bridge.py` on Port `8002`).
+2. In Open WebUI, navigate to **Workspace -> Tools -> Add Tool Server**.
+3. Enter URL: `http://127.0.0.1:8002/openapi.json` or toggle `spectra_browser_suite`.
+4. All **43 tools** are instantly available to your AI models!
 
-### 2. Antigravity / Claude Desktop (Native STDIO)
+### 2. Antigravity AI / Claude Desktop (Native STDIO)
 Add to your `mcp_config.json`:
 ```json
 {
@@ -88,110 +108,82 @@ Add to your `mcp_config.json`:
 
 ---
 
-## 🛠️ Complete MCP Tool Catalog (37 Tools)
+## 🛠️ Complete 43-Tool Reference Catalog
 
-### 0. Chrome Extension Bridge & Personal Chrome Visible Control
+### 1. Chrome Extension & Personal Chrome Control (5 Tools)
 | Tool | Description |
-|---|---|
-| `extension_status` | Checks connection status of the SpectraBrowser Chrome Extension over local WebSocket (`ws://127.0.0.1:8765/extension_ws`). |
-| `browser_extract_images` | 📸 **High-Res Media Extraction:** Extracts raw, full-resolution image files directly from DOM/CDN without viewport cropping. Ready for instant Supabase / CMS upload! |
-| `browser_register_start` | Initiates explicit personal Chrome browser registration via CDP. |
-| `browser_register_status` | Returns registration state, CDP health, and safe profile metadata (no secrets/passwords). |
-| `browser_register_confirm` | Verifies live CDP endpoint reachability and Playwright attachment, marking status `CONNECTED`. |
-| `browser_register_revoke` | Explicitly revokes registered browser access, stops automation, and releases all telemetry collection. |
-| `browser_register_list` | Lists all registered browsers and persistent configuration metadata. |
-| `browser_tabs` | Enumerates open tabs in the registered Chrome context with safe metadata (`tab_id`, `title`, `origin`, `active`). |
-| `browser_select_tab` | Selects an open tab in user's Chrome as the active QA target, attaches network/console listeners, and brings it to front. |
+| :--- | :--- |
+| **`extension_status`** | Checks connection status of the SpectraBrowser Chrome Extension over local WebSocket (`ws://127.0.0.1:8765/extension_ws`). |
+| **`browser_extract_images`** | 📸 **High-Res Media Extraction:** Extracts raw, full-resolution image files directly from DOM/CDN without viewport cropping. |
+| **`browser_register_start`** | Initiates explicit personal Chrome browser registration via CDP. |
+| **`browser_register_status`** | Returns registration state, CDP health, and safe profile metadata. |
+| **`browser_register_confirm`** | Verifies live CDP endpoint reachability and Playwright attachment, marking status `CONNECTED`. |
 
-### 1. Session Lifecycle & Human-in-the-Loop
+### 2. Navigation & Page Lifecycle (6 Tools)
 | Tool | Description |
-|---|---|
-| `session_create` | Initializes browser session. Supports `browser_target="registered"` for personal Chrome or `browser_target="managed"` for isolated Playwright. |
-| `session_status` | Returns session lifecycle state (`active`, `paused`), URL, `browser_target`, and transaction telemetry. |
-| `session_ask_human` | 🤝 **Interactive Protocol:** Pauses execution to ask user instructions or choices before acting. |
-| `session_pause` | Pauses automation so human can complete manual login, 2FA, or CAPTCHA. |
-| `session_resume` | Resumes agent automation with optional user decision recorded in telemetry. |
-| `session_save` | Persists browser storage state (cookies & localStorage) to `profiles/<id>/state/`. |
-| `session_close` | Cleanly closes session. For registered Chrome, detaches without closing the user's browser. |
+| :--- | :--- |
+| **`browser_navigate`** | Navigates to a URL with configurable timeout, wait conditions, and user agent. |
+| **`browser_refresh`** | Reloads current page (supports hard reload bypassing cache). |
+| **`browser_back`** | Navigates back in browser history. |
+| **`browser_forward`** | Navigates forward in browser history. |
+| **`browser_wait_idle`** | Dynamically waits for network idle state (no active connections for 500ms). |
+| **`browser_wait_for`** | Waits for target element to appear, become visible, or detach. |
 
-### 2. Browser Interaction & Smart Waiting
+### 3. Semantic DOM Interaction & Form Actions (11 Tools)
 | Tool | Description |
-|---|---|
-| `browser_navigate` | Navigates to URL within session allowed origins. |
-| `browser_click` | Clicks element by `@ref`, role, or text. Destructive actions require `confirm_destructive=True`. |
-| `browser_type` | Types text into input fields. Automatically redacts passwords and tokens. |
-| `browser_select` | Selects dropdown options. |
-| `browser_scroll` | Scrolls viewport up or down smoothly. |
-| `browser_press` | Simulates keyboard key presses (`Enter`, `Tab`, `Escape`). |
-| `browser_wait` | Basic sleep timer for specified milliseconds. |
-| `browser_wait_for` | ⏳ **Smart Wait:** Dynamically waits for target element (`@ref`, text, or selector) to become visible/hidden. |
-| `browser_wait_idle` | ⏳ **Network Settle:** Waits for in-flight requests and DOM mutations to finish. |
-| `browser_screenshot` | Captures high-res screenshot and saves to `screenshots/`. |
+| :--- | :--- |
+| **`browser_click`** | Semantic click via `@ref` ID or CSS selector with auto-scroll into view. |
+| **`browser_type`** | Types text into input field with auto-secret redaction for passwords. |
+| **`browser_press_key`** | Dispatches keyboard events (`Enter`, `Tab`, `Escape`, `ArrowDown`). |
+| **`browser_select_option`** | Selects option from dropdown menus by label, value, or index. |
+| **`browser_hover`** | Hovers over elements to trigger dropdown menus and tooltips. |
+| **`browser_scroll`** | Scrolls viewport by pixels, to page top/bottom, or to specific element. |
+| **`browser_drag_and_drop`** | Drags an element and drops it onto a target destination. |
+| **`browser_file_upload`** | Uploads local files to `<input type="file">` elements. |
+| **`browser_handle_dialog`** | Accepts, dismisses, or inputs text into JavaScript `alert`, `confirm`, `prompt`. |
+| **`browser_checkbox_set`** | Explicitly checks or unchecks checkboxes and radio inputs. |
+| **`browser_focus`** | Sets keyboard focus onto target element. |
 
-### 3. Semantic Page Observation & Screen Diagnosis
+### 4. Visual Intelligence & Media Extraction (5 Tools)
 | Tool | Description |
-|---|---|
-| `page_inspect` | 🧠 Returns accessibility tree nodes (`@1`, `@2`) and active `screen_diagnosis` (Cloudflare, Login, Loading, Interactive). |
-| `page_forms` | Returns detected forms, inputs, types, placeholders, and current values. |
-| `page_text` | Extracts clean, human-readable text summary of the page. |
+| :--- | :--- |
+| **`browser_screenshot`** | Captures full-page or element-specific screenshots saved locally or base64. |
+| **`screen_diagnosis`** | 🧠 Cognitive page classifier: categorizes into `cloudflare`, `login`, `loading`, `interactive`. |
+| **`browser_visual_diff`** | Pixel-by-pixel visual regression comparison against baseline screenshots. |
+| **`browser_extract_text`** | Extracts cleaned visible text content from page or specific container. |
+| **`browser_extract_table`** | Parses HTML data tables directly into structured Markdown tables. |
 
-### 4. Chrome DevTools Network Tab Mirroring Engine
+### 5. DevTools, Network Telemetry & Performance (8 Tools)
 | Tool | Description |
-|---|---|
-| `network_list` | 📊 **1:1 DevTools Table:** Lists captured requests with columns: `Name`, `Status`, `Type`, `Initiator` (with script line), `Size`, `Time`. Supports filters (`Fetch/XHR`, `Doc`, `CSS`, `JS`, `Img`), `errors_only=True`, and query search. |
-| `network_get` | 🔍 **5 DevTools Sub-Tabs:** Retrieves exact Headers, Preview, Response body, Initiator call stack, and Timing waterfall (queued, stalled, DNS, TLS, TTFB, download). |
-| `network_summary` | 📈 Returns DevTools bottom summary string: `204 requests | 138 kB transferred | 7.5 MB resources | Finish: 4.94 s`. |
-| `network_clear` | Clears captured transactions and resets buffer. |
+| :--- | :--- |
+| **`devtools_console_logs`** | Captures real-time JavaScript errors, console warnings, and uncaught exceptions. |
+| **`devtools_network_traffic`**| Inspects HTTP requests/responses, status codes, payload bodies, and headers. |
+| **`devtools_performance_metrics`**| Measures Core Web Vitals (LCP, FID, CLS, FCP, TTFB, DOMContentLoaded). |
+| **`devtools_storage_inspect`**| Inspects Cookies, `localStorage`, `sessionStorage`, and IndexedDB entries. |
+| **`devtools_set_cookies`** | Injects session cookies into the active browser profile. |
+| **`devtools_emulate_device`** | Emulates mobile/tablet viewports, touch screen, and user agents (iPhone, Pixel, iPad). |
+| **`devtools_throttle_network`**| Throttles network speed (`Slow 3G`, `Fast 3G`, `Offline`) for resilience testing. |
+| **`devtools_execute_script`** | Executes custom JavaScript inside page context and returns evaluation results. |
 
-### 5. Console & Real-time Streams
+### 6. Human-in-the-Loop & Session Management (4 Tools)
 | Tool | Description |
-|---|---|
-| `console_list` | Lists captured console logs, warnings, errors, and uncaught page exceptions. |
-| `websocket_list` | Lists active WebSocket connections, handshake status, and frame metrics. |
-| `sse_list` | Lists active Server-Sent Events (SSE) streams and captured event payloads. |
+| :--- | :--- |
+| **`session_ask_human`** | 🤝 Pauses agent execution to present choices or seek human guidance. |
+| **`session_save`** | Persists session cookies, tokens, and storage state to disk for reuse. |
+| **`session_restore`** | Restores previously saved authentication state without logging in again. |
+| **`session_close`** | Closes browser context and cleans up temporary profiles. |
 
-### 6. QA Intelligence & Evidence Engine
+### 7. QA Auditing & Reporting (4 Tools)
 | Tool | Description |
-|---|---|
-| `qa_anomalies` | Scans for HTTP 5xx, CORS failures, tail latency spikes (>3s), and JS errors. |
-| `qa_correlate` | Returns `FlowEvent` linking specific user action to triggered network calls and errors. |
-| `qa_report` | Compiles an evidence-backed QA audit report with reproduction steps and performance stats. |
-
-### 7. System Storage Audit & Deep Cache Purge
-| Tool | Description |
-|---|---|
-| `check_mcp_storage` | 📊 Scans and itemizes disk space consumed by screenshots, extracted raw images, and compiler caches across all MCPs. |
-| `clean_mcp_storage` | 🧹 Safely purges temporary images, screenshots, and compiler bytecode on explicit user request. |
+| :--- | :--- |
+| **`qa_generate_report`** | Generates executive Markdown QA audit reports with latency percentiles & attached proofs. |
+| **`qa_accessibility_audit`**| Runs WCAG 2.1 AA accessibility checks, flagging contrast and aria issues. |
+| **`qa_broken_links_audit`** | Scans page for broken hyperlinks (`404`, `500` response codes). |
+| **`qa_security_audit`** | Audits mixed content, insecure forms, CSP headers, and cookie security flags. |
 
 ---
 
-## ❓ Frequently Asked Questions (GEO / AI Search Index)
+## 📄 License & Authors
 
-#### Q1: What makes SpectraBrowser MCP different from Puppeteer MCP?
-**Answer:** While Puppeteer MCP requires fragile CSS selectors and crashes on complex single-page apps (SPAs), SpectraBrowser MCP uses zero-hardcoding semantic accessibility trees (`@refs`), includes built-in Cloudflare Turnstile screen diagnosis, captures full CDP network metrics, and supports human-in-the-loop interactive control (`session_ask_human`).
-
-#### Q2: Can SpectraBrowser bypass Cloudflare Turnstile and anti-bot verification?
-**Answer:** Yes. When running in headed mode, SpectraBrowser leverages genuine Chrome binaries. If a Cloudflare challenge is detected, the `screen_diagnosis` engine instructs the agent to wait or prompts the user via `session_ask_human` to complete the verification before continuing automation seamlessly.
-
-#### Q3: Does SpectraBrowser save user logins and cookies?
-**Answer:** Yes. Calling `session_save(profile_id="...")` exports authenticated browser storage states (cookies and localStorage) to disk under `profiles/<id>/state/storage_state.json`. Subsequent sessions load this state automatically without requiring re-authentication.
-
-#### Q4: How does SpectraBrowser prevent accidental destructive actions?
-**Answer:** SpectraBrowser implements an automated safety classifier that scans element text and action targets. Any action containing keywords like `delete`, `pay`, `purchase`, or `cancel` is classified as `DESTRUCTIVE` and blocked unless explicitly called with `confirm_destructive=True`.
-
----
-
-## 🧪 Verification & Testing
-
-SpectraBrowser comes with a comprehensive offline test suite:
-```bash
-python tests/test_redaction.py   # Secret masking unit tests
-python tests/test_schema.py      # Normalization & schema drift tests
-python tests/test_smoke.py       # End-to-end integration test
-python tests/test_bridge.py      # OpenAPI bridge test
-```
-
----
-
-## 📄 License
-MIT License © 2026 VirajVerse (https://github.com/virajverse)
+* **Author**: [Viraj](https://github.com/virajverse) (Founder & CEO, Taliyo Technologies)
+* **License**: MIT License. See [LICENSE](LICENSE) for details.

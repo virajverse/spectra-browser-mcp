@@ -170,6 +170,12 @@ def browser_navigate(url: str, session_id: str = "default") -> Dict[str, Any]:
 
 
 @mcp.tool()
+def browser_reload(ignore_cache: bool = True, session_id: str = "default") -> Dict[str, Any]:
+    """Reloads the active tab with DevTools Network & Console monitoring enabled to capture complete traffic from start."""
+    return service.browser_reload(ignore_cache=ignore_cache, session_id=session_id)
+
+
+@mcp.tool()
 def browser_click(
     target: str,
     observation_id: Optional[str] = None,
@@ -224,9 +230,9 @@ def browser_select(
 
 
 @mcp.tool()
-def browser_scroll(direction: str = "down", amount: int = 500, session_id: str = "default") -> Dict[str, Any]:
-    """Scrolls page viewport up or down."""
-    return service.browser_scroll(direction, amount, session_id)
+def browser_scroll(direction: str = "down", amount: int = 500, target: Optional[str] = None, session_id: str = "default") -> Dict[str, Any]:
+    """Scrolls page viewport up or down, or scrolls a specific element (@ref or CSS selector) into view."""
+    return service.browser_scroll(direction, amount, target, session_id)
 
 
 @mcp.tool()
@@ -236,9 +242,13 @@ def browser_press(key: str = "Enter", session_id: str = "default") -> Dict[str, 
 
 
 @mcp.tool()
-def browser_extract_images(save_dir: Optional[str] = None) -> Dict[str, Any]:
+def browser_extract_images(
+    save_dir: Optional[str] = None,
+    return_base64: bool = False,
+    session_id: str = "default"
+) -> Dict[str, Any]:
     """Extracts all full-resolution images from the active webpage and downloads them in original quality without screenshots."""
-    return service.browser_extract_images(save_dir)
+    return service.browser_extract_images(save_dir=save_dir, return_base64=return_base64, session_id=session_id)
 
 
 @mcp.tool()
@@ -265,9 +275,14 @@ def browser_wait_idle(timeout_ms: int = 10000, session_id: str = "default") -> D
 
 
 @mcp.tool()
-def browser_screenshot(session_id: str = "default", full_page: bool = False) -> Dict[str, Any]:
-    """Captures screenshot and returns local artifact file path."""
-    return service.browser_screenshot(session_id, full_page)
+def browser_screenshot(
+    session_id: str = "default",
+    full_page: bool = False,
+    save_to_disk: bool = False,
+    return_base64: bool = True
+) -> Dict[str, Any]:
+    """Captures screenshot with Pure In-Memory Ephemeral Stream (0 disk bytes used by default). Set save_to_disk=True only if local file artifact is needed."""
+    return service.browser_screenshot(session_id=session_id, full_page=full_page, save_to_disk=save_to_disk, return_base64=return_base64)
 
 
 # ==========================================

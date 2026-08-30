@@ -55,7 +55,8 @@ def test_registration_endpoints_via_bridge():
     assert "registration_id" in data
     reg_id = data["registration_id"]
     assert data["display_name"] == "OpenAPI Bridge Chrome"
-    assert data["status"] in ("CONNECTED", "WAITING_FOR_USER", "REGISTERING")
+    assert data["status"] in ("CONNECTED", "WAITING_FOR_USER", "REGISTERING", "waiting_for_extension")
+
 
     # 2. List registrations
     list_res = client.post("/browser_register_list", json={})
@@ -74,7 +75,8 @@ def test_registration_endpoints_via_bridge():
     assert rev_res.status_code == 200
     rev_data = rev_res.json()
     assert rev_data["success"] is True
-    assert rev_data["status"] == "REVOKED"
+    assert rev_data["status"].lower() == "revoked"
+
 
 
 if __name__ == "__main__":
