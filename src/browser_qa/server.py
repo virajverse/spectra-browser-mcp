@@ -1,5 +1,15 @@
 """FastMCP Server exposing capability-oriented Browser QA & Network Intelligence tools."""
 
+import sys
+if sys.platform == "win32":
+    try:
+        if hasattr(sys.stdout, "reconfigure"):
+            sys.stdout.reconfigure(encoding="utf-8")
+        if hasattr(sys.stderr, "reconfigure"):
+            sys.stderr.reconfigure(encoding="utf-8")
+    except Exception:
+        pass
+
 from typing import Any, Dict, List, Optional
 from mcp.server.fastmcp import FastMCP
 from browser_qa.service import BrowserQAService
@@ -285,6 +295,16 @@ def browser_screenshot(
     return service.browser_screenshot(session_id=session_id, full_page=full_page, save_to_disk=save_to_disk, return_base64=return_base64)
 
 
+@mcp.tool()
+def browser_ocr(
+    image_path: Optional[str] = None,
+    session_id: str = "default",
+    filter_pattern: Optional[str] = None
+) -> Dict[str, Any]:
+    """Runs ultra-fast RapidOCR (ONNX) on the current browser tab or local image path to extract visible text, phone numbers, prices, and bounding boxes in <100ms."""
+    return service.browser_ocr(image_path=image_path, session_id=session_id, filter_pattern=filter_pattern)
+
+
 # ==========================================
 # 3. Page Observation Tools
 # ==========================================
@@ -444,6 +464,58 @@ def check_mcp_storage() -> Dict[str, Any]:
 def clean_mcp_storage(dry_run: bool = False) -> Dict[str, Any]:
     """Safely wipes temporary screenshots, extracted images, and compiler caches to recover disk space on user's laptop. Only run on explicit user request."""
     return service.storage_clean(dry_run=dry_run)
+
+
+# ==========================================
+# 8. Media Optimization & Smart Canvas Tools
+# ==========================================
+
+@mcp.tool()
+def optimize_media_for_platform(
+    image_path: str,
+    platform: str = "INSTAGRAM",
+    max_size_kb: int = 200,
+    output_format: str = "WEBP",
+    background_color: str = "#0F172A",
+    custom_width: Optional[int] = None,
+    custom_height: Optional[int] = None
+) -> Dict[str, Any]:
+    """Crops, canvas-fits, and compresses raw heavy ChatGPT / web images down to <= 200KB.
+
+    Presets:
+    - INSTAGRAM: 1080x1350 4:5 portrait with smart canvas
+    - STORY / REEL: 1080x1920 9:16 vertical full screen
+    - SQUARE: 1080x1080 1:1 square
+    - EMAIL: Max width 650px crisp downscale for instant Gmail opening
+    - BLOG / OG: 1200x630 OpenGraph hero banner
+    - THUMBNAIL: 1280x720 16:9 landscape
+    - CUSTOM: uses custom_width and custom_height
+    """
+    return service.optimize_media_for_platform(
+        image_path=image_path,
+        platform=platform,
+        max_size_kb=max_size_kb,
+        output_format=output_format,
+        background_color=background_color,
+        custom_width=custom_width,
+        custom_height=custom_height
+    )
+
+
+@mcp.tool()
+def optimize_media_batch(
+    source_dir_or_pattern: Optional[str] = None,
+    platform: str = "INSTAGRAM",
+    max_size_kb: int = 200,
+    output_format: str = "WEBP"
+) -> Dict[str, Any]:
+    """Batch-optimizes all extracted images from active browser session or custom directory down to target platform size."""
+    return service.optimize_media_batch(
+        source_dir_or_files=source_dir_or_pattern,
+        platform=platform,
+        max_size_kb=max_size_kb,
+        output_format=output_format
+    )
 
 
 if __name__ == "__main__":

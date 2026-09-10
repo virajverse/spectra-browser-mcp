@@ -6,10 +6,12 @@ WebSocket Bridge without launching isolated or headless browser instances.
 
 import base64
 import hashlib
+import threading
 import time
 import urllib.request
 from pathlib import Path
 from typing import Any, Dict, List, Optional
+
 
 from browser_qa.browser.extension_bridge import ExtensionBridge
 from browser_qa.collectors.lifecycle import EventBus
@@ -18,6 +20,7 @@ from browser_qa.models.action import ActionType
 from browser_qa.models.event import BaseEvent
 from browser_qa.models.session import BrowserMode, BrowserTarget, SessionStatus
 from browser_qa.processors.correlator import Correlator
+from browser_qa.processors.media_optimizer import optimize_image, optimize_batch
 from browser_qa.processors.schema import SchemaTracker
 from browser_qa.qa.findings import FindingEngine
 from browser_qa.qa.performance import PerformanceEngine
@@ -27,7 +30,21 @@ from browser_qa.storage.memory import MemoryStore
 class BrowserQAService:
     """Singleton-ready Core Engine for Extension-Native Browser Control and QA Intelligence."""
 
+    _instance: Optional["BrowserQAService"] = None
+    _lock = threading.Lock()
+
+    def __new__(cls, *args, **kwargs):
+        if cls._instance is None:
+            with cls._lock:
+                if cls._instance is None:
+                    cls._instance = super().__new__(cls)
+                    cls._instance._initialized = False
+        return cls._instance
+
     def __init__(self):
+        if getattr(self, "_initialized", False):
+            return
+        self._initialized = True
         self.storage = MemoryStore()
         self.event_bus = EventBus(self.storage)
         self.correlator = Correlator(self.storage)
@@ -44,6 +61,7 @@ class BrowserQAService:
         # Extension Bridge for direct live Chrome tab control without restarts
         self.extension_bridge = ExtensionBridge(self.storage)
         self.extension_bridge.start()
+
 
     def _require_extension(self):
         """Ensures the Chrome extension is connected before executing actions."""
@@ -391,7 +409,8 @@ class BrowserQAService:
         self,
         save_dir: Optional[str] = None,
         return_base64: bool = False,
-        session_id: str = "default"
+        session_id: str = "default",
+        auto_optimize_platform: Optional[str] = None
     ) -> Dict[str, Any]:
         """Extracts and saves all full-resolution images from the active page with SHA-256 deduplication."""
         self._require_extension()
@@ -474,6 +493,13 @@ class BrowserQAService:
                     "supabase_ready": True,
                     "taliyo_action": "Pass this 'file_path' directly to taliyo-blog-engine's 'upload_blog_image' or 'create_blog_post' to auto-host on Supabase Storage!"
                 }
+                if auto_optimize_platform:
+                    try:
+                        opt_res = optimize_image(image_path=str(filepath), platform=auto_optimize_platform)
+                        if opt_res.get("status") == "success":
+                            item["optimized"] = opt_res
+                    except Exception:
+                        pass
                 if return_base64 and b64:
                     item["base64"] = b64
                 saved.append(item)
@@ -522,9 +548,68 @@ class BrowserQAService:
             "text": obs.visible_text_summary[:max_chars]
         }
 
+    def browser_ocr(
+        self,
+        image_path: Optional[str] = None,
+        session_id: str = "default",
+        filter_pattern: Optional[str] = None
+    ) -> Dict[str, Any]:
+        """Runs ultra-fast RapidOCR (ONNX) on the current browser tab or a local image path.
+        Extracts detected text, confidence ratings, and bounding boxes without heavy PyTorch.
+        """
+        import numpy as np
+        from io import BytesIO
+        from PIL import Image
+
+        raw_bytes = None
+        if image_path and Path(image_path).exists():
+            raw_bytes = Path(image_path).read_bytes()
+        else:
+            self._require_extension()
+            res = self.extension_bridge.send_command_sync("screenshot", {}, timeout=15.0)
+            data_url = res.get("dataUrl", "")
+            if "," in data_url:
+                raw_bytes = base64.b64decode(data_url.split(",")[1])
+
+        if not raw_bytes:
+            raise ValueError("No image data available for OCR analysis.")
+
+        pil_img = Image.open(BytesIO(raw_bytes)).convert("RGB")
+        img_np = np.array(pil_img)
+
+        try:
+            from rapidocr_onnxruntime import RapidOCR
+            engine = RapidOCR()
+            ocr_result, elapse = engine(img_np)
+        except Exception as e:
+            raise RuntimeError(f"RapidOCR engine initialization failed: {e}")
+
+        lines = []
+        full_text = []
+        if ocr_result:
+            for item in ocr_result:
+                box, text, score = item[0], item[1], float(item[2])
+                if filter_pattern and filter_pattern.lower() not in text.lower():
+                    continue
+                lines.append({
+                    "text": text,
+                    "confidence": round(score, 4),
+                    "box": box
+                })
+                full_text.append(text)
+
+        return {
+            "success": True,
+            "detected_lines_count": len(lines),
+            "full_text": "\n".join(full_text),
+            "lines": lines,
+            "engine": "RapidOCR-ONNX"
+        }
+
     # ==========================================
     # 4. Network & Stream Telemetry
     # ==========================================
+
 
     def network_stream(
         self,
@@ -743,37 +828,34 @@ class BrowserQAService:
 
     def storage_inspect(self) -> Dict[str, Any]:
         """Scans and itemizes all temporary storage consumed by MCPs."""
-        workspace_root = Path(__file__).resolve().parent.parent.parent.parent
-        screenshots_dir = workspace_root / "spectra-browser-mcp" / "screenshots"
-        
         items = []
         total_bytes = 0
-        
-        if screenshots_dir.exists():
-            for f in screenshots_dir.glob("*.*"):
+
+        if SCREENSHOTS_DIR.exists():
+            for f in SCREENSHOTS_DIR.rglob("*.*"):
                 if f.is_file():
                     sz = f.stat().st_size
                     total_bytes += sz
-                    items.append({"name": f.name, "size_bytes": sz, "path": str(f)})
-                    
+                    items.append({"name": f.name, "size_bytes": sz, "size_kb": round(sz / 1024, 2), "path": str(f)})
+
         return {
             "status": "success",
+            "storage_path": str(SCREENSHOTS_DIR),
             "screenshots_count": len(items),
+            "total_files": len(items),
             "total_bytes": total_bytes,
+            "total_kb": round(total_bytes / 1024, 2),
             "total_mb": round(total_bytes / (1024 * 1024), 2),
-            "files": items[:20]
+            "files": items[:25]
         }
 
     def storage_clean(self, dry_run: bool = False) -> Dict[str, Any]:
         """Safely wipes temporary screenshots and caches."""
-        workspace_root = Path(__file__).resolve().parent.parent.parent.parent
-        screenshots_dir = workspace_root / "spectra-browser-mcp" / "screenshots"
-        
         deleted_count = 0
         freed_bytes = 0
-        
-        if screenshots_dir.exists():
-            for f in screenshots_dir.glob("*.*"):
+
+        if SCREENSHOTS_DIR.exists():
+            for f in SCREENSHOTS_DIR.rglob("*.*"):
                 if f.is_file():
                     sz = f.stat().st_size
                     freed_bytes += sz
@@ -783,7 +865,7 @@ class BrowserQAService:
                             f.unlink()
                         except Exception:
                             pass
-                            
+
         return {
             "status": "success",
             "dry_run": dry_run,
@@ -792,4 +874,49 @@ class BrowserQAService:
             "freed_mb": round(freed_bytes / (1024 * 1024), 2),
             "message": f"Storage clean complete. Freed {round(freed_bytes / (1024 * 1024), 2)} MB across {deleted_count} files."
         }
+
+    # ==========================================
+    # 8. Media Optimization & Smart Canvas
+    # ==========================================
+
+    def optimize_media_for_platform(
+        self,
+        image_path: str,
+        platform: str = "INSTAGRAM",
+        max_size_kb: int = 200,
+        output_format: str = "WEBP",
+        background_color: str = "#0F172A",
+        custom_width: Optional[int] = None,
+        custom_height: Optional[int] = None,
+        output_dir: Optional[str] = None
+    ) -> Dict[str, Any]:
+        """Compresses, crops, and canvas-fits images for target platforms (INSTAGRAM, STORY, SQUARE, EMAIL, BLOG, THUMBNAIL, CUSTOM)."""
+        return optimize_image(
+            image_path=image_path,
+            platform=platform,
+            max_size_kb=max_size_kb,
+            output_format=output_format,
+            background_color=background_color,
+            custom_width=custom_width,
+            custom_height=custom_height,
+            output_dir=output_dir
+        )
+
+    def optimize_media_batch(
+        self,
+        source_dir_or_files: Optional[Any] = None,
+        platform: str = "INSTAGRAM",
+        max_size_kb: int = 200,
+        output_format: str = "WEBP",
+        background_color: str = "#0F172A"
+    ) -> Dict[str, Any]:
+        """Batch-optimizes images in extracted_images directory or a custom path."""
+        return optimize_batch(
+            source_dir_or_files=source_dir_or_files,
+            platform=platform,
+            max_size_kb=max_size_kb,
+            output_format=output_format,
+            background_color=background_color
+        )
+
 

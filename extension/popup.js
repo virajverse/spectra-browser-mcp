@@ -10,9 +10,15 @@ let currentTab = null;
 let isAttached = false;
 
 async function init() {
+  // Wake up service worker and ensure WebSocket connection
+  try {
+    chrome.runtime.sendMessage({ action: "ensure_connected" });
+  } catch (e) {}
+
   // Get active tab
   const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
   currentTab = tab;
+
 
   if (tab) {
     tabTitle.textContent = tab.title || "Untitled";

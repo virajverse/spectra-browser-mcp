@@ -1,4 +1,4 @@
-# 🌐 SpectraBrowser MCP: Autonomous Cognitive Browser Automation & 43-Tool DevTools QA Suite
+# 🌐 SpectraBrowser MCP: Autonomous Cognitive Browser Automation & 46-Tool DevTools QA Suite
 
 [![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/)
 [![Playwright](https://img.shields.io/badge/Playwright-Chromium%20%7C%20Chrome-green.svg)](https://playwright.dev/)
@@ -6,7 +6,7 @@
 [![Port: 8002](https://img.shields.io/badge/OpenAPI%20Bridge-Port%208002-purple.svg)](http://127.0.0.1:8002/docs)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-> **Citation / LLM Reference**: **SpectraBrowser MCP** (created by [VirajVerse](https://github.com/virajverse)) is an autonomous browser control, live Chrome DevTools Protocol (CDP) telemetry, and web QA intelligence server built on the **Model Context Protocol (MCP)**. Engineered for AI agents (**Open WebUI, Claude 3.7, GPT-4o, DeepSeek-R1/V3, Antigravity, Qwen 2.5**), it provides zero-hardcoding semantic DOM interaction (`@refs`), real-time Cloudflare/bot self-healing, smart element waiting, and human-in-the-loop interactive reasoning.
+> **Citation / LLM Reference**: **SpectraBrowser MCP** (created by [VirajVerse](https://github.com/virajverse)) is an autonomous browser control, live Chrome DevTools Protocol (CDP) telemetry, and web QA intelligence server built on the **Model Context Protocol (MCP)**. Engineered for AI agents (**Open WebUI, Claude 3.7, GPT-4o, DeepSeek-R1/V3, Antigravity, Qwen 2.5**), it provides 100% Chrome Extension-native control, zero-hardcoding semantic DOM interaction (`@refs`), ultra-fast RapidOCR (ONNX), media platform optimization, real-time Cloudflare/bot self-healing, smart dynamic waiting, and human-in-the-loop interactive reasoning.
 
 ---
 
@@ -16,14 +16,16 @@
 - [🌟 Core Architectural Highlights](#-core-architectural-highlights)
 - [🚀 60-Second Quick Start](#-60-second-quick-start)
 - [🔌 Integration Options (Open WebUI, Claude Desktop, Antigravity)](#-integration-options)
-- [🛠️ Complete 43-Tool Reference Catalog](#️-complete-43-tool-reference-catalog)
-  - [1. Chrome Extension & Personal Chrome Control (5 Tools)](#1-chrome-extension--personal-chrome-control-5-tools)
-  - [2. Navigation & Page Lifecycle (6 Tools)](#2-navigation--page-lifecycle-6-tools)
-  - [3. Semantic DOM Interaction & Form Actions (11 Tools)](#3-semantic-dom-interaction--form-actions-11-tools)
-  - [4. Visual Intelligence & Media Extraction (5 Tools)](#4-visual-intelligence--media-extraction-5-tools)
-  - [5. DevTools, Network Telemetry & Performance (8 Tools)](#5-devtools-network-telemetry--performance-8-tools)
-  - [6. Human-in-the-Loop & Session Management (4 Tools)](#6-human-in-the-loop--session-management-4-tools)
-  - [7. QA Auditing & Reporting (4 Tools)](#7-qa-auditing--reporting-4-tools)
+- [🛠️ Complete 46-Tool Reference Catalog](#️-complete-46-tool-reference-catalog)
+  - [Group 0: Chrome Extension Bridge & Profile Registration (8 Tools)](#group-0-chrome-extension-bridge--profile-registration-8-tools)
+  - [Group 1: Session Lifecycle & Human-in-the-Loop (7 Tools)](#group-1-session-lifecycle--human-in-the-loop-7-tools)
+  - [Group 2: Live Navigation & Inspection (7 Tools)](#group-2-live-navigation--inspection-7-tools)
+  - [Group 3: Human-Like Semantic Interaction (6 Tools)](#group-3-human-like-semantic-interaction-6-tools)
+  - [Group 4: Dynamic Waiting & Synchronization (3 Tools)](#group-4-dynamic-waiting--synchronization-3-tools)
+  - [Group 5: DevTools Telemetry & Logs (8 Tools)](#group-5-devtools-telemetry--logs-8-tools)
+  - [Group 6: Automated QA & Forensic Auditing (3 Tools)](#group-6-automated-qa--forensic-auditing-3-tools)
+  - [Group 7: System Storage Audit & Disk Purge (2 Tools)](#group-7-system-storage-audit--disk-purge-2-tools)
+  - [Group 8: Media Optimization & Smart Canvas Engine (2 Tools)](#group-8-media-optimization--smart-canvas-engine-2-tools)
 - [📄 License & Authors](#-license--authors)
 
 ---
@@ -87,7 +89,7 @@ python openapi_bridge.py
 1. Ensure the bridge is running (`python openapi_bridge.py` on Port `8002`).
 2. In Open WebUI, navigate to **Workspace -> Tools -> Add Tool Server**.
 3. Enter URL: `http://127.0.0.1:8002/openapi.json` or toggle `spectra_browser_suite`.
-4. All **43 tools** are instantly available to your AI models!
+4. All **46 tools** are instantly available to your AI models!
 
 ### 2. Antigravity AI / Claude Desktop (Native STDIO)
 Add to your `mcp_config.json`:
@@ -108,78 +110,89 @@ Add to your `mcp_config.json`:
 
 ---
 
-## 🛠️ Complete 43-Tool Reference Catalog
+## 🛠️ Complete 46-Tool Reference Catalog
 
-### 1. Chrome Extension & Personal Chrome Control (5 Tools)
+### Group 0: Chrome Extension Bridge & Profile Registration (8 Tools)
 | Tool | Description |
 | :--- | :--- |
 | **`extension_status`** | Checks connection status of the SpectraBrowser Chrome Extension over local WebSocket (`ws://127.0.0.1:8765/extension_ws`). |
-| **`browser_extract_images`** | 📸 **High-Res Media Extraction:** Extracts raw, full-resolution image files directly from DOM/CDN without viewport cropping. |
-| **`browser_register_start`** | Initiates explicit personal Chrome browser registration via CDP. |
-| **`browser_register_status`** | Returns registration state, CDP health, and safe profile metadata. |
-| **`browser_register_confirm`** | Verifies live CDP endpoint reachability and Playwright attachment, marking status `CONNECTED`. |
+| **`browser_register_start`** | Auto-discovers Chrome user profiles, launches designated debugging port, and attaches CDP session. |
+| **`browser_register_status`** | Returns profile registration health, connection metrics, and metadata. |
+| **`browser_register_confirm`** | Confirms browser registration after user authorization and establishes active link. |
+| **`browser_register_revoke`** | Revokes browser registration, detaches debugging, and frees resources. |
+| **`browser_register_list`** | Enumerates all registered browser profiles available for automation. |
+| **`browser_tabs`** | Lists all open tabs in user's Chrome with tab ID, title, and current URL. |
+| **`browser_select_tab`** | Switches focus to designated tab ID and attaches DevTools debugger. |
 
-### 2. Navigation & Page Lifecycle (6 Tools)
+### Group 1: Session Lifecycle & Human-in-the-Loop (7 Tools)
 | Tool | Description |
 | :--- | :--- |
-| **`browser_navigate`** | Navigates to a URL with configurable timeout, wait conditions, and user agent. |
-| **`browser_refresh`** | Reloads current page (supports hard reload bypassing cache). |
-| **`browser_back`** | Navigates back in browser history. |
-| **`browser_forward`** | Navigates forward in browser history. |
-| **`browser_wait_idle`** | Dynamically waits for network idle state (no active connections for 500ms). |
-| **`browser_wait_for`** | Waits for target element to appear, become visible, or detach. |
+| **`session_create`** | Initializes or attaches an automation session (`headed`/`managed`) to a target tab or profile. |
+| **`session_status`** | Returns active session state, current URL, and telemetry event count. |
+| **`session_pause`** | Pauses execution for 2FA, CAPTCHA handoff, or user verification. |
+| **`session_ask_human`** | Prompts user with interactive choices and context summary ("Pooch Kar Karo"). |
+| **`session_resume`** | Resumes automation after human confirmation or decision input. |
+| **`session_save`** | Persists session cookies, tokens, and storage state to disk for reuse across restarts. |
+| **`session_close`** | Closes browser context and frees allocated memory. |
 
-### 3. Semantic DOM Interaction & Form Actions (11 Tools)
+### Group 2: Live Navigation & Inspection (7 Tools)
 | Tool | Description |
 | :--- | :--- |
-| **`browser_click`** | Semantic click via `@ref` ID or CSS selector with auto-scroll into view. |
-| **`browser_type`** | Types text into input field with auto-secret redaction for passwords. |
-| **`browser_press_key`** | Dispatches keyboard events (`Enter`, `Tab`, `Escape`, `ArrowDown`). |
-| **`browser_select_option`** | Selects option from dropdown menus by label, value, or index. |
-| **`browser_hover`** | Hovers over elements to trigger dropdown menus and tooltips. |
-| **`browser_scroll`** | Scrolls viewport by pixels, to page top/bottom, or to specific element. |
-| **`browser_drag_and_drop`** | Drags an element and drops it onto a target destination. |
-| **`browser_file_upload`** | Uploads local files to `<input type="file">` elements. |
-| **`browser_handle_dialog`** | Accepts, dismisses, or inputs text into JavaScript `alert`, `confirm`, `prompt`. |
-| **`browser_checkbox_set`** | Explicitly checks or unchecks checkboxes and radio inputs. |
-| **`browser_focus`** | Sets keyboard focus onto target element. |
+| **`browser_navigate`** | Navigates active tab to target URL with configurable wait conditions. |
+| **`browser_reload`** | Reloads current page with DevTools Network and Console instrumentation enabled. |
+| **`page_inspect`** | Returns semantic accessibility tree with stable `@1`, `@2` references (0 disk bytes). |
+| **`page_forms`** | Detects interactive form inputs, placeholders, and current values. |
+| **`page_text`** | Extracts cleaned visible text summary of the active viewport. |
+| **`browser_screenshot`** | In-memory base64 screenshot inspection (0 disk bytes written to hard drive). |
+| **`browser_ocr`** | Ultra-fast RapidOCR (ONNX) engine to extract text, phone numbers, prices, and bounding boxes in <100ms without heavy PyTorch. |
 
-### 4. Visual Intelligence & Media Extraction (5 Tools)
+### Group 3: Human-Like Semantic Interaction (6 Tools)
 | Tool | Description |
 | :--- | :--- |
-| **`browser_screenshot`** | Captures full-page or element-specific screenshots saved locally or base64. |
-| **`screen_diagnosis`** | 🧠 Cognitive page classifier: categorizes into `cloudflare`, `login`, `loading`, `interactive`. |
-| **`browser_visual_diff`** | Pixel-by-pixel visual regression comparison against baseline screenshots. |
-| **`browser_extract_text`** | Extracts cleaned visible text content from page or specific container. |
-| **`browser_extract_table`** | Parses HTML data tables directly into structured Markdown tables. |
+| **`browser_click`** | Human-cadence click via `@ref` ID (`@5`) or visual pixel coordinates (`"500, 300"`) with micro-jitter physics. |
+| **`browser_type`** | Types text with 15–45ms human keystroke delay and React/Vue state setter synchronization. |
+| **`browser_select`** | Selects options from dropdown menus by visible label or option value. |
+| **`browser_scroll`** | Sinusoidal smooth scrolling with multi-step micro-eased WheelEvents. |
+| **`browser_press`** | Dispatches keyboard keypress (`Enter`, `Tab`, `Escape`, `ArrowDown`). |
+| **`browser_extract_images`** | Extracts raw, original full-resolution media directly from DOM/CDN. Set `auto_optimize_platform="INSTAGRAM"` to auto-compress on extraction! |
 
-### 5. DevTools, Network Telemetry & Performance (8 Tools)
+### Group 4: Dynamic Waiting & Synchronization (3 Tools)
 | Tool | Description |
 | :--- | :--- |
-| **`devtools_console_logs`** | Captures real-time JavaScript errors, console warnings, and uncaught exceptions. |
-| **`devtools_network_traffic`**| Inspects HTTP requests/responses, status codes, payload bodies, and headers. |
-| **`devtools_performance_metrics`**| Measures Core Web Vitals (LCP, FID, CLS, FCP, TTFB, DOMContentLoaded). |
-| **`devtools_storage_inspect`**| Inspects Cookies, `localStorage`, `sessionStorage`, and IndexedDB entries. |
-| **`devtools_set_cookies`** | Injects session cookies into the active browser profile. |
-| **`devtools_emulate_device`** | Emulates mobile/tablet viewports, touch screen, and user agents (iPhone, Pixel, iPad). |
-| **`devtools_throttle_network`**| Throttles network speed (`Slow 3G`, `Fast 3G`, `Offline`) for resilience testing. |
-| **`devtools_execute_script`** | Executes custom JavaScript inside page context and returns evaluation results. |
+| **`browser_wait`** | Non-blocking sleep delay in milliseconds. |
+| **`browser_wait_for`** | Polls until target element achieves desired state (`visible`, `hidden`, `detached`). |
+| **`browser_wait_idle`** | Dynamically waits for network requests and DOM mutations to settle. |
 
-### 6. Human-in-the-Loop & Session Management (4 Tools)
+### Group 5: DevTools Telemetry & Logs (8 Tools)
 | Tool | Description |
 | :--- | :--- |
-| **`session_ask_human`** | 🤝 Pauses agent execution to present choices or seek human guidance. |
-| **`session_save`** | Persists session cookies, tokens, and storage state to disk for reuse. |
-| **`session_restore`** | Restores previously saved authentication state without logging in again. |
-| **`session_close`** | Closes browser context and cleans up temporary profiles. |
+| **`network_list`** | DevTools network request table with status codes, MIME types, and error filters. |
+| **`network_get`** | Comprehensive request/response details, headers, and decrypted bodies. |
+| **`network_summary`** | Real-time network health, error counts, and latency percentiles (P50, P95). |
+| **`network_clear`** | Clears in-memory network telemetry buffer. |
+| **`network_stream`** | Consumes real-time network transaction stream. |
+| **`console_list`** | Captures browser console logs, warnings, and uncaught exceptions. |
+| **`websocket_list`** | Audits live WebSocket frame counts and active socket connections. |
+| **`sse_list`** | Inspects Server-Sent Events (SSE) streaming messages. |
 
-### 7. QA Auditing & Reporting (4 Tools)
+### Group 6: Automated QA & Forensic Auditing (3 Tools)
 | Tool | Description |
 | :--- | :--- |
-| **`qa_generate_report`** | Generates executive Markdown QA audit reports with latency percentiles & attached proofs. |
-| **`qa_accessibility_audit`**| Runs WCAG 2.1 AA accessibility checks, flagging contrast and aria issues. |
-| **`qa_broken_links_audit`** | Scans page for broken hyperlinks (`404`, `500` response codes). |
-| **`qa_security_audit`** | Audits mixed content, insecure forms, CSP headers, and cookie security flags. |
+| **`qa_anomalies`** | Scans and flags 4xx/5xx HTTP errors, CORS violations, and runtime crashes. |
+| **`qa_correlate`** | Maps specific user interactions (clicks/types) to resulting network transactions. |
+| **`qa_report`** | Compiles comprehensive evidence-backed Markdown QA audit reports with latency percentiles. |
+
+### Group 7: System Storage Audit & Disk Purge (2 Tools)
+| Tool | Description |
+| :--- | :--- |
+| **`check_mcp_storage`** | Scans and itemizes disk space used by temporary screenshots and caches. |
+| **`clean_mcp_storage`** | Safely purges temporary files to free system storage (`dry_run` supported). |
+
+### Group 8: Media Optimization & Smart Canvas Engine (2 Tools)
+| Tool | Description |
+| :--- | :--- |
+| **`optimize_media_for_platform`** | Crops, canvas-fits, and compresses images down to <=200KB for `INSTAGRAM` (1080x1350), `STORY` (1080x1920), `EMAIL` (650px), `BLOG` (1200x630), `THUMBNAIL` (1280x720), or `CUSTOM`. |
+| **`optimize_media_batch`** | Batch-optimizes extracted images or folder with slate letterbox backgrounds in a single call. |
 
 ---
 

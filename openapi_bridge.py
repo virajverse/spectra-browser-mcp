@@ -11,7 +11,7 @@ from pydantic import create_model
 CURRENT_DIR = Path(__file__).resolve().parent
 sys.path.insert(0, str(CURRENT_DIR / "src"))
 
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 import uvicorn
@@ -104,6 +104,17 @@ def register_tool_endpoint(tool):
 # Register all MCP tools dynamically with typed request payload models
 for tool in mcp._tool_manager.list_tools():
     register_tool_endpoint(tool)
+
+
+@app.post("/extension_command")
+async def execute_extension_command(request: Request):
+    """Internal bridge route enabling secondary MCP processes (e.g. DeepSeek Harness stdio) to execute commands via the primary WebSocket connection."""
+    body = await request.json()
+    command = body.get("command")
+    params = body.get("params", {})
+    timeout = float(body.get("timeout", 25.0))
+    from browser_qa.server import service
+    return await asyncio.to_thread(service.extension_bridge.send_command_sync, command, params, timeout)
 
 
 

@@ -17,7 +17,21 @@ from browser_qa.storage.interface import StorageInterface
 class ExtensionBridge:
     """Manages WebSocket communication between SpectraBrowser MCP and the Chrome Extension."""
 
-    def __init__(self, storage: StorageInterface, host: str = "127.0.0.1", port: int = 8765):
+    _instance: Optional["ExtensionBridge"] = None
+    _lock = threading.Lock()
+
+    def __new__(cls, *args, **kwargs):
+        if cls._instance is None:
+            with cls._lock:
+                if cls._instance is None:
+                    cls._instance = super().__new__(cls)
+                    cls._instance._initialized = False
+        return cls._instance
+
+    def __init__(self, storage: StorageInterface, host: str = "0.0.0.0", port: int = 8765):
+        if getattr(self, "_initialized", False):
+            return
+        self._initialized = True
         self.storage = storage
         self.host = host
         self.port = port
@@ -29,6 +43,8 @@ class ExtensionBridge:
         self._last_heartbeat = 0.0
         self._tabs_cache: List[Dict[str, Any]] = []
         self._active_network_tx: Dict[str, Any] = {}
+
+
 
     def start(self):
         """Starts the WebSocket server in a background daemon thread."""
@@ -318,29 +334,71 @@ class ExtensionBridge:
         except Exception as e:
             print(f"[ExtensionBridge] Telemetry parsing error: {e}")
 
+    def _check_remote_bridge(self) -> bool:
+        """Checks if primary SpectraBrowser instance is running on port 8002 with extension connected."""
+        now = time.time()
+        if hasattr(self, "_remote_cache_time") and (now - getattr(self, "_remote_cache_time", 0) < 2.0):
+            return getattr(self, "_remote_connected", False)
+
+        try:
+            import urllib.request
+            req = urllib.request.Request(
+                "http://127.0.0.1:8002/extension_status",
+                data=b"{}",
+                headers={"Content-Type": "application/json"}
+            )
+            with urllib.request.urlopen(req, timeout=1.0) as resp:
+                if resp.status == 200:
+                    data = json.loads(resp.read().decode("utf-8"))
+                    connected = bool(data.get("extension_connected", False))
+                    self._remote_connected = connected
+                    self._remote_cache_time = now
+                    return connected
+        except Exception:
+            pass
+
+        self._remote_connected = False
+        self._remote_cache_time = now
+        return False
+
     def is_connected(self) -> bool:
-        """Returns True if Chrome extension is actively connected."""
-        return self._ws is not None and (time.time() - self._last_heartbeat < 45)
+        """Returns True if Chrome extension is actively connected directly or via local OpenAPI bridge."""
+        if self._ws is not None and (time.time() - self._last_heartbeat < 45):
+            return True
+        return self._check_remote_bridge()
 
     def send_command_sync(self, command: str, params: Optional[Dict[str, Any]] = None, timeout: float = 25.0) -> Any:
         """Sends a command to the Chrome extension synchronously."""
-        if not self.is_connected():
-            raise ConnectionError(
-                "Spectra Chrome Extension is not connected. "
-                "Please ensure Chrome is open and the SpectraBrowser extension is loaded in chrome://extensions."
+        # 1. Direct WebSocket execution if extension connected to THIS process
+        if self._ws is not None:
+            req_id = f"cmd_{uuid.uuid4().hex[:8]}"
+
+            async def _do_send():
+                fut = self._loop.create_future()
+                self._pending_requests[req_id] = fut
+                payload = json.dumps({"id": req_id, "command": command, "params": params or {}})
+                await self._ws.send(payload)
+                return await asyncio.wait_for(fut, timeout=timeout)
+
+            future = asyncio.run_coroutine_threadsafe(_do_send(), self._loop)
+            return future.result(timeout=timeout)
+
+        # 2. Transparent fallback to primary OpenAPI bridge on port 8002
+        if self._check_remote_bridge():
+            import urllib.request
+            payload = json.dumps({"command": command, "params": params or {}, "timeout": timeout}).encode("utf-8")
+            req = urllib.request.Request(
+                "http://127.0.0.1:8002/extension_command",
+                data=payload,
+                headers={"Content-Type": "application/json"}
             )
+            with urllib.request.urlopen(req, timeout=timeout + 5.0) as resp:
+                return json.loads(resp.read().decode("utf-8"))
 
-        req_id = f"cmd_{uuid.uuid4().hex[:8]}"
-
-        async def _do_send():
-            fut = self._loop.create_future()
-            self._pending_requests[req_id] = fut
-            payload = json.dumps({"id": req_id, "command": command, "params": params or {}})
-            await self._ws.send(payload)
-            return await asyncio.wait_for(fut, timeout=timeout)
-
-        future = asyncio.run_coroutine_threadsafe(_do_send(), self._loop)
-        return future.result(timeout=timeout)
+        raise ConnectionError(
+            "Spectra Chrome Extension is not connected. "
+            "Please ensure Chrome is open and the SpectraBrowser extension is loaded in chrome://extensions."
+        )
 
     # ─── High-Level Browser Capabilities ───
 

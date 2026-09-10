@@ -8,7 +8,7 @@ description: >-
   cross-MCP Supabase image hosting, autonomous continuous learning, and evidence-backed QA audit reporting.
 ---
 
-# 🌐 SpectraBrowser MCP: Autonomous Cognitive Agent Playbook (43 Tools)
+# 🌐 SpectraBrowser MCP: Autonomous Cognitive Agent Playbook (46 Tools)
 
 This skill provides **rigorous, code-verified operational instructions** for any AI agent (**Open WebUI, Antigravity, Claude 3.7, GPT-4o, DeepSeek-R1/V3, Qwen, Llama 3.3**) to autonomously explore, interact with, extract media from, debug, and audit web applications using the **100% Extension-Native & CDP SpectraBrowser MCP Suite** (`spectra-browser-mcp` on Port 8002).
 
@@ -94,7 +94,7 @@ Whenever an AI Agent attempts any SpectraBrowser action and the Chrome Extension
 
 ---
 
-## 🛠️ Complete Tool Reference Specification (All 43 Tools)
+## 🛠️ Complete Tool Reference Specification (All 46 Tools)
 
 ### Group 0: Chrome Extension Bridge & Profile Registration (8 Tools)
 1. **`extension_status()`**: Checks if Spectra Chrome Extension is connected via WebSocket.
@@ -115,42 +115,49 @@ Whenever an AI Agent attempts any SpectraBrowser action and the Chrome Extension
 14. **`session_save(session_id="default", profile_id=None)`**: Persists cookies/storage state.
 15. **`session_close(session_id="default")`**: Closes session and frees memory.
 
-### Group 2: Live Navigation & Inspection (6 Tools)
+---
+
+### Group 2: Live Navigation & Inspection (7 Tools)
 16. **`browser_navigate(url, session_id="default")`**: Navigates active tab to target URL.
 17. **`browser_reload(ignore_cache=True, session_id="default")`**: Reloads tab with DevTools Network & Console enabled.
 18. **`page_inspect(session_id="default")`**: Returns semantic accessibility tree with `@1`, `@2` tags (0 disk bytes).
 19. **`page_forms(session_id="default")`**: Detects form inputs, placeholders, and current values.
 20. **`page_text(session_id="default", max_chars=3000)`**: Extracts visible text summary of active page.
 21. **`browser_screenshot(session_id="default", full_page=False, save_to_disk=False, return_base64=True)`**: In-memory screenshot (0 disk bytes).
+22. **`browser_ocr(image_path=None, session_id="default", filter_pattern=None)`**: Ultra-fast RapidOCR (ONNX) engine to extract text, phone numbers, prices, and bounding boxes in <100ms without heavy PyTorch.
 
 ### Group 3: Human-Like Semantic Interaction (6 Tools)
-22. **`browser_click(target, observation_id=None, session_id="default", confirm_destructive=False)`**: Clicks tagged element (`@5`) or coordinates (`"500, 300"`).
-23. **`browser_type(target, text, observation_id=None, clear=False, session_id="default")`**: Types text with 15–45ms human cadence.
-24. **`browser_select(target, option, observation_id=None, session_id="default")`**: Selects dropdown option.
-25. **`browser_scroll(direction="down", amount=500, target=None, session_id="default")`**: Sinusoidal smooth scrolling.
-26. **`browser_press(key="Enter", session_id="default")`**: Dispatches keyboard keypress (`Enter`, `Tab`, `Escape`).
-27. **`browser_extract_images(save_dir=None, return_base64=False, session_id="default")`**: Extracts original quality images directly from DOM/CDN.
+23. **`browser_click(target, observation_id=None, session_id="default", confirm_destructive=False)`**: Clicks tagged element (`@5`) or coordinates (`"500, 300"`).
+24. **`browser_type(target, text, observation_id=None, clear=False, session_id="default")`**: Types text with 15–45ms human cadence.
+25. **`browser_select(target, option, observation_id=None, session_id="default")`**: Selects dropdown option.
+26. **`browser_scroll(direction="down", amount=500, target=None, session_id="default")`**: Sinusoidal smooth scrolling.
+27. **`browser_press(key="Enter", session_id="default")`**: Dispatches keyboard keypress (`Enter`, `Tab`, `Escape`).
+28. **`browser_extract_images(save_dir=None, return_base64=False, session_id="default", auto_optimize_platform=None)`**: Extracts original quality images directly from DOM/CDN. Set `auto_optimize_platform="INSTAGRAM"` or `"EMAIL"` to auto-compress on extraction!
 
 ### Group 4: Dynamic Waiting & Synchronization (3 Tools)
-28. **`browser_wait(ms=1000, session_id="default")`**: Sleep in milliseconds.
-29. **`browser_wait_for(target, state="visible", timeout_ms=15000, session_id="default")`**: Polls until element state is achieved.
-30. **`browser_wait_idle(timeout_ms=10000, session_id="default")`**: Waits for network/DOM mutations to settle.
+29. **`browser_wait(ms=1000, session_id="default")`**: Sleep in milliseconds.
+30. **`browser_wait_for(target, state="visible", timeout_ms=15000, session_id="default")`**: Polls until element state is achieved.
+31. **`browser_wait_idle(timeout_ms=10000, session_id="default")`**: Waits for network/DOM mutations to settle.
 
 ### Group 5: DevTools Telemetry & Logs (8 Tools)
-31. **`network_list(session_id="default", filter_type=None, status_code=None, errors_only=False, search_query=None, limit=100)`**: DevTools network request table.
-32. **`network_get(request_id, session_id="default", include_request_body=True, include_response_body=True, max_body_bytes=100000)`**: Full request/response details.
-33. **`network_summary(session_id="default")`**: Latency percentiles (P50/P95) and error breakdown.
-34. **`network_clear(session_id="default")`**: Resets telemetry buffer.
-35. **`network_stream(session_id="default", filter_type=None, limit=20)`**: Consumes real-time stream.
-36. **`console_list(session_id="default", min_level="info", limit=50)`**: Console logs and uncaught errors.
-37. **`websocket_list(session_id="default")`**: Active WebSocket frame metrics.
-38. **`sse_list(session_id="default")`**: Server-Sent Events stream messages.
+32. **`network_list(session_id="default", filter_type=None, status_code=None, errors_only=False, search_query=None, limit=100)`**: DevTools network request table.
+33. **`network_get(request_id, session_id="default", include_request_body=True, include_response_body=True, max_body_bytes=100000)`**: Full request/response details.
+34. **`network_summary(session_id="default")`**: Latency percentiles (P50/P95) and error breakdown.
+35. **`network_clear(session_id="default")`**: Resets telemetry buffer.
+36. **`network_stream(session_id="default", filter_type=None, limit=20)`**: Consumes real-time stream.
+37. **`console_list(session_id="default", min_level="info", limit=50)`**: Console logs and uncaught errors.
+38. **`websocket_list(session_id="default")`**: Active WebSocket frame metrics.
+39. **`sse_list(session_id="default")`**: Server-Sent Events stream messages.
 
 ### Group 6: Automated QA & Forensic Auditing (3 Tools)
-39. **`qa_anomalies(session_id="default")`**: Scans for 4xx/5xx errors, CORS issues, and crashes.
-40. **`qa_correlate(action_id=None, session_id="default")`**: Maps user clicks to network transactions.
-41. **`qa_report(session_id="default", format_type="markdown")`**: Generates evidence-backed QA markdown report.
+40. **`qa_anomalies(session_id="default")`**: Scans for 4xx/5xx errors, CORS issues, and crashes.
+41. **`qa_correlate(action_id=None, session_id="default")`**: Maps user clicks to network transactions.
+42. **`qa_report(session_id="default", format_type="markdown")`**: Generates evidence-backed QA markdown report.
 
 ### Group 7: System Storage Audit & Disk Purge (2 Tools)
-42. **`check_mcp_storage()`**: Scans disk space used by temporary screenshots and logs.
-43. **`clean_mcp_storage(dry_run=False)`**: Safely purges temporary files to free laptop storage.
+43. **`check_mcp_storage()`**: Scans disk space used by temporary screenshots and logs.
+44. **`clean_mcp_storage(dry_run=False)`**: Safely purges temporary files to free laptop storage.
+
+### Group 8: Media Optimization & Smart Canvas Engine (2 Tools)
+45. **`optimize_media_for_platform(image_path, platform="INSTAGRAM", max_size_kb=200, output_format="WEBP", background_color="#0F172A", custom_width=None, custom_height=None)`**: Crops, canvas-fits, and compresses raw heavy ChatGPT or web images down to <=200KB for `INSTAGRAM` (1080x1350), `STORY` (1080x1920), `EMAIL` (650px), `BLOG` (1200x630), `THUMBNAIL` (1280x720), or `CUSTOM`.
+46. **`optimize_media_batch(source_dir_or_pattern=None, platform="INSTAGRAM", max_size_kb=200, output_format="WEBP")`**: Batch-optimizes all newly extracted browser images or a folder in one call.

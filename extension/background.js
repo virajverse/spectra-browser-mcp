@@ -78,7 +78,29 @@ setInterval(() => {
   }
 }, 20000);
 
+// Lifecycle & runtime message handlers
+chrome.runtime.onInstalled.addListener(() => {
+  connectWebSocket();
+});
+
+chrome.runtime.onStartup.addListener(() => {
+  connectWebSocket();
+});
+
+chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+  if (message.action === "ensure_connected" || message.action === "reconnect") {
+    connectWebSocket();
+    sendResponse({ connected: isConnected });
+  }
+  return true;
+});
+
+// Connect immediately on extension startup
+connectWebSocket();
+
+
 // ─── Message Handling from MCP Server ───
+
 async function handleMcpMessage(msg) {
   const { id, command, params } = msg;
 
@@ -332,14 +354,33 @@ async function reloadTab(ignoreCache = true, tabId = null) {
   });
 }
 
-async function captureScreenshot() {
+async function captureScreenshot(tabId = null) {
+  const id = tabId || attachedTabId || (await getActiveTab())?.id;
+  
+  // 1. Primary Attempt: chrome.tabs.captureVisibleTab
   try {
     const dataUrl = await chrome.tabs.captureVisibleTab(null, { format: "png" });
-    return { dataUrl };
-  } catch (err) {
-    throw new Error(`Screenshot failed: ${err.message}`);
+    if (dataUrl && dataUrl.startsWith("data:image/")) {
+      return { dataUrl };
+    }
+  } catch (e) {
+    console.warn("[SpectraBridge] captureVisibleTab failed, trying CDP fallback:", e);
   }
+
+  // 2. Resilient Fallback: CDP Page.captureScreenshot (Works even if window is unfocused or in background!)
+  try {
+    const activeTabId = await ensureAttached(id);
+    const result = await chrome.debugger.sendCommand({ tabId: activeTabId }, "Page.captureScreenshot", { format: "png" });
+    if (result && result.data) {
+      return { dataUrl: `data:image/png;base64,${result.data}` };
+    }
+  } catch (cdpErr) {
+    console.error("[SpectraBridge] CDP Page.captureScreenshot failed:", cdpErr);
+  }
+
+  throw new Error("Screenshot failed: Ensure Chrome has an active open tab and Spectra extension is loaded.");
 }
+
 
 async function executeCdpCommand(method, params = {}, tabId = null) {
   const id = await ensureAttached(tabId);
