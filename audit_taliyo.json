@@ -1,0 +1,242 @@
+{
+ "url": "https://taliyotechnologies.com/",
+ "title": "Taliyo Technologies - Top IT Company in India | Web Development, App Development, Digital Marketing",
+ "n_elements": 64,
+ "headings": [],
+ "text": "",
+ "forms": [
+  {
+   "form_ref_id": null,
+   "action": "",
+   "method": "POST",
+   "inputs": [
+    {
+     "ref_id": "@35",
+     "name": "",
+     "input_type": "text",
+     "value": "",
+     "placeholder": "",
+     "required": false,
+     "options": []
+    }
+   ],
+   "submit_ref_id": null
+  }
+ ],
+ "vitals": {
+  "success": true,
+  "session_id": "taliyo_audit",
+  "by_initiator": {
+   "css": 1,
+   "fetch": 7,
+   "link": 3,
+   "other": 7,
+   "script": 23
+  },
+  "dom_content_loaded_ms": 1872,
+  "first_contentful_paint_ms": null,
+  "first_paint_ms": null,
+  "load_ms": 3788,
+  "resources_count": 41,
+  "total_transfer_bytes": 871545,
+  "total_transfer_kb": 851,
+  "ttfb_ms": 245,
+  "url": "https://taliyotechnologies.com/"
+ },
+ "a11y": {
+  "success": true,
+  "session_id": "taliyo_audit",
+  "score": 80,
+  "violations": [
+   {
+    "count": 2,
+    "rule": "button-name",
+    "severity": "critical"
+   }
+  ],
+  "counts": {
+   "images": 3,
+   "buttons": 65,
+   "inputs": 1
+  }
+ },
+ "meta": {
+  "broken": [
+   "https://taliyotechnologies.com/ai-particle-robot.png"
+  ],
+  "desc": "Leading IT company in India offering web development, app development, graphic design, and digital marketing services. Based in Delhi, serving clients worldwide.",
+  "h1": 1,
+  "imgs": 3,
+  "imgsNoAlt": 0,
+  "links": 53,
+  "nav": [
+   {
+    "h": "https://taliyotechnologies.com/",
+    "t": ""
+   },
+   {
+    "h": "https://taliyotechnologies.com/",
+    "t": "Home"
+   },
+   {
+    "h": "https://taliyotechnologies.com/projects",
+    "t": "Projects"
+   },
+   {
+    "h": "https://taliyotechnologies.com/services",
+    "t": "Services"
+   },
+   {
+    "h": "https://taliyotechnologies.com/about",
+    "t": "About"
+   },
+   {
+    "h": "https://taliyotechnologies.com/blog",
+    "t": "Blog"
+   },
+   {
+    "h": "https://taliyotechnologies.com/contact",
+    "t": "Contact"
+   },
+   {
+    "h": "https://taliyotechnologies.com/contact",
+    "t": "Book a Free Call"
+   }
+  ]
+ },
+ "home_shot": "D:\\Company work\\research\\spectra-browser-mcp-main\\screenshots\\taliyo_audit\\scr_ext_taliyo_audit_1790077356.png",
+ "pages": {
+  "Projects": {
+   "title": "Taliyo Technologies - Top IT Company in India | Web Development, App Development, Digital Marketing",
+   "url": "https://taliyotechnologies.com/projects",
+   "elements": 133,
+   "vitals": {
+    "success": true,
+    "session_id": "taliyo_audit",
+    "by_initiator": {
+     "css": 1,
+     "fetch": 5,
+     "img": 2,
+     "link": 3,
+     "other": 5,
+     "script": 22
+    },
+    "dom_content_loaded_ms": 393,
+    "first_contentful_paint_ms": null,
+    "first_paint_ms": null,
+    "load_ms": 430,
+    "resources_count": 38,
+    "total_transfer_bytes": 3142388,
+    "total_transfer_kb": 3069,
+    "ttfb_ms": 68,
+    "url": "https://taliyotechnologies.com/projects"
+   },
+   "a11y": {
+    "success": true,
+    "session_id": "taliyo_audit",
+    "score": 80,
+    "violations": [
+     {
+      "count": 2,
+      "rule": "button-name",
+      "severity": "critical"
+     }
+    ],
+    "counts": {
+     "images": 16,
+     "buttons": 120,
+     "inputs": 1
+    }
+   },
+   "shot": "D:\\Company work\\research\\spectra-browser-mcp-main\\screenshots\\taliyo_audit\\scr_ext_taliyo_audit_1790077362.png"
+  },
+  "Services": {
+   "title": "Taliyo Technologies - Top IT Company in India | Web Development, App Development, Digital Marketing",
+   "url": "https://taliyotechnologies.com/services",
+   "elements": 132,
+   "vitals": {
+    "success": true,
+    "session_id": "taliyo_audit",
+    "by_initiator": {
+     "css": 1,
+     "fetch": 7,
+     "img": 27,
+     "link": 3,
+     "other": 5,
+     "script": 27
+    },
+    "dom_content_loaded_ms": 213,
+    "first_contentful_paint_ms": null,
+    "first_paint_ms": null,
+    "load_ms": 213,
+    "resources_count": 70,
+    "total_transfer_bytes": 8103025,
+    "total_transfer_kb": 7913,
+    "ttfb_ms": 51,
+    "url": "https://taliyotechnologies.com/services"
+   },
+   "a11y": {
+    "success": true,
+    "session_id": "taliyo_audit",
+    "score": 80,
+    "violations": [
+     {
+      "count": 2,
+      "rule": "button-name",
+      "severity": "critical"
+     }
+    ],
+    "counts": {
+     "images": 43,
+     "buttons": 93,
+     "inputs": 1
+    }
+   },
+   "shot": "D:\\Company work\\research\\spectra-browser-mcp-main\\screenshots\\taliyo_audit\\scr_ext_taliyo_audit_1790077367.png"
+  },
+  "About": {
+   "title": "Taliyo Technologies - Top IT Company in India | Web Development, App Development, Digital Marketing",
+   "url": "https://taliyotechnologies.com/about",
+   "elements": 49,
+   "vitals": {
+    "success": true,
+    "session_id": "taliyo_audit",
+    "by_initiator": {
+     "css": 1,
+     "fetch": 4,
+     "img": 3,
+     "link": 3,
+     "other": 5,
+     "script": 21
+    },
+    "dom_content_loaded_ms": 261,
+    "first_contentful_paint_ms": null,
+    "first_paint_ms": null,
+    "load_ms": 262,
+    "resources_count": 37,
+    "total_transfer_bytes": 3149240,
+    "total_transfer_kb": 3075,
+    "ttfb_ms": 100,
+    "url": "https://taliyotechnologies.com/about"
+   },
+   "a11y": {
+    "success": true,
+    "session_id": "taliyo_audit",
+    "score": 80,
+    "violations": [
+     {
+      "count": 2,
+      "rule": "button-name",
+      "severity": "critical"
+     }
+    ],
+    "counts": {
+     "images": 4,
+     "buttons": 49,
+     "inputs": 1
+    }
+   },
+   "shot": "D:\\Company work\\research\\spectra-browser-mcp-main\\screenshots\\taliyo_audit\\scr_ext_taliyo_audit_1790077372.png"
+  }
+ }
+}

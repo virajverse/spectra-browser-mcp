@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>SpectraBrowser MCP</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+    body { width: 340px; background: #0F172A; color: #F8FAFC; padding: 16px; font-size: 13px; }
+    .header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; border-bottom: 1px solid #1E293B; padding-bottom: 10px; }
+    .logo { display: flex; align-items: center; gap: 8px; font-weight: 700; font-size: 15px; letter-spacing: -0.3px; color: #E2E8F0; }
+    .logo-icon { width: 22px; height: 22px; border-radius: 50%; background: linear-gradient(135deg, #6366F1, #0EA5E9); display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: bold; }
+    .badge { padding: 3px 8px; border-radius: 12px; font-size: 10px; font-weight: 700; text-transform: uppercase; }
+    .badge-online { background: rgba(16, 185, 129, 0.2); color: #34D399; border: 1px solid rgba(16, 185, 129, 0.4); }
+    .badge-offline { background: rgba(239, 68, 68, 0.2); color: #F87171; border: 1px solid rgba(239, 68, 68, 0.4); }
+
+    .card { background: #1E293B; border-radius: 8px; padding: 12px; margin-bottom: 12px; border: 1px solid #334155; }
+    .card-label { font-size: 11px; text-transform: uppercase; color: #94A3B8; font-weight: 600; margin-bottom: 4px; }
+    .card-title { font-size: 13px; font-weight: 600; color: #F1F5F9; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .card-url { font-size: 11px; color: #38BDF8; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 2px; }
+
+    .btn { width: 100%; padding: 10px; border-radius: 6px; border: none; font-weight: 600; font-size: 13px; cursor: pointer; transition: all 0.15s ease; display: flex; align-items: center; justify-content: center; gap: 6px; }
+    .btn-primary { background: #6366F1; color: white; }
+    .btn-primary:hover { background: #4F46E5; }
+    .btn-danger { background: rgba(239, 68, 68, 0.2); color: #F87171; border: 1px solid rgba(239, 68, 68, 0.4); }
+    .btn-danger:hover { background: rgba(239, 68, 68, 0.3); }
+
+    .hint { font-size: 11px; color: #64748B; text-align: center; margin-top: 10px; line-height: 1.4; }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <div class="logo">
+      <div class="logo-icon">S</div>
+      <span>SpectraBrowser</span>
+    </div>
+    <span id="statusBadge" class="badge badge-offline">Checking...</span>
+  </div>
+
+  <div class="card">
+    <div class="card-label">Current Active Tab</div>
+    <div id="tabTitle" class="card-title">Loading...</div>
+    <div id="tabUrl" class="card-url">...</div>
+  </div>
+
+  <div class="card" id="attachedCard" style="display:none; border-color: #10B981;">
+    <div class="card-label" style="color: #34D399;">Active MCP Session</div>
+    <div style="font-size: 12px; color: #CBD5E1;">AI Agent is attached and controlling this tab.</div>
+  </div>
+
+  <button id="toggleBtn" class="btn btn-primary">
+    <span>Attach MCP to Tab</span>
+  </button>
+
+  <p class="hint">
+    SpectraBrowser MCP is running locally.<br>
+    No browser restart or debugging flags required.
+  </p>
+
+  <script src="popup.js"></script>
+</body>
+</html>
