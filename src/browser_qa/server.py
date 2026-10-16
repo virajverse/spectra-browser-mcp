@@ -10,9 +10,12 @@ if sys.platform == "win32":
     except Exception:
         pass
 
-from typing import Any, Dict, List, Optional
-from mcp.server.fastmcp import FastMCP
+try:
+    from mcp.server.fastmcp import FastMCP
+except (ImportError, ModuleNotFoundError):
+    from mcp.server.mcpserver import MCPServer as FastMCP
 from browser_qa.service import BrowserQAService
+
 
 mcp = FastMCP("browser-qa")
 service = BrowserQAService()
