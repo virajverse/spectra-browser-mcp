@@ -1,6 +1,8 @@
 """FastMCP Server exposing capability-oriented Browser QA & Network Intelligence tools."""
 
 import sys
+from typing import Dict, Any, Optional, List, Union
+
 if sys.platform == "win32":
     try:
         if hasattr(sys.stdout, "reconfigure"):
