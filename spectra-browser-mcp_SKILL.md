@@ -369,30 +369,35 @@ POST /browser_ocr {"session_id":"default"}
 
 ---
 
-## 🤝 Two-Engine Symbiosis: Spectra-Browser + Infinity-Scraper MCP
+## 🤝 Decoupled Agentic Symbiosis: Spectra-Browser + Infinity-Scraper MCP
 
-Neither pure headless scraping nor heavy interactive browser automation is 100% complete in isolation. By orchestrating **InfinityScrape (Port 8000)** and **SpectraBrowser (Port 8002)**, an AI agent operates with **98-99% real-world web coverage**:
+> **Core Agent Directive (Zero Hardcoded Coupling):**
+> SpectraBrowser and InfinityScrape are **100% decoupled, independent MCP servers**. Neither server hardcodes calls to the other.
+> **The AI AGENT is the Brain & Sole Orchestrator:**
+> 1. **Default High Speed:** The AI Agent runs high-speed research, search, sitemaps, and bulk scraping using **InfinityScrape** (<150ms per page, 33 tools).
+> 2. **Signal Detection:** If InfinityScrape encounters an interactive anti-bot wall (Cloudflare Turnstile, Reddit "Prove your humanity", or 403 challenge), it returns an explicit **Anti-Bot Advisory Signal** (`requires_browser_escalation: true`).
+> 3. **Agent-Driven Escalation:** The **AI Agent** reads this signal and autonomously decides to shift that single blocked target to **SpectraBrowser** (`browser_navigate(url=...)`, followed by `page_understand()` or `page_inspect()`).
+> 4. **Bypass & Resume:** SpectraBrowser accesses the URL via the user's real human Chrome context. The AI Agent ingests the rendered markdown and immediately resumes high-speed bulk operations with InfinityScrape!
 
 ```
 ┌────────────────────────────────────────────────────────────────────────┐
-│                  WATERFALL ESCALATION ARCHITECTURE                     │
+│             DECOUPLED AGENTIC WATERFALL ARCHITECTURE                   │
 └───────────────────────────────────┬────────────────────────────────────┘
                                     │
-      ┌─────────────────────────────▼─────────────────────────────┐
-      │  TIER 1: InfinityScrape Fast Engine (TLS JA3 / primp)     │ ➔ Covers ~88-90% of web
-      │  • Ultra-fast (<150ms), 20MB RAM, zero headless overhead │    (Sitemaps, OSINT, Bulk)
-      └─────────────────────────────┬─────────────────────────────┘
-                                    │ (If thin content / JS detected)
-      ┌─────────────────────────────▼─────────────────────────────┐
-      │  TIER 2: InfinityScrape Auto Browser (Playwright / Edge)  │ ➔ Covers ~6-8% of web
-      │  • Lightweight headless SPA rendering, CSS selectors      │    (React, SPAs, Vue)
-      └─────────────────────────────┬─────────────────────────────┘
-                                    │ (If is_bot_challenge / Turnstile / Login Wall)
-      ┌─────────────────────────────▼─────────────────────────────┐
-      │  TIER 3: SpectraBrowser MCP (Extension-Native / CDP)      │ ➔ Covers the stubborn 2-4%
-      │  • Real human Chrome session, genuine cookies, GPU canvas │    (LinkedIn, Reddit CAPTCHA,
-      │  • Visual OCR, coordinate clicks, 2FA/login preservation  │     Akamai/Datadome walls)
-      └───────────────────────────────────────────────────────────┘
+                               [AI AGENT]
+                         (The Brain & Decision Maker)
+                                    │
+         ┌──────────────────────────┴──────────────────────────┐
+         ▼                                                     ▼
+┌─────────────────────────────────┐           ┌─────────────────────────────────┐
+│     INFINITY SCRAPER (MCP)      │           │      SPECTRA BROWSER (MCP)      │
+│ • Ultra-Fast TLS Engine (<150ms)│           │ • Live Chrome Extension / CDP   │
+│ • 33 Tools: OSINT, Search, Docs │           │ • 99 Tools: DOM & Visual QA     │
+│ • Fast, Lightweight (20MB RAM)  │           │ • Human Cookies & GPU Canvas    │
+└────────────────┬────────────────┘           └────────────────┬────────────────┘
+                 │                                             ▲
+                 │ (If Anti-Bot Challenge Signal Raised)       │
+                 └────────────► [AI AGENT SHIFTS] ─────────────┘
 ```
 
 ### 🔬 Honest Reality Check: 5 Remaining Bottlenecks (Zero Cheating)
