@@ -1,6 +1,6 @@
 {
   "mcpServers": {
-    "browser-qa": {
+    "spectra-browser": {
       "command": "python",
       "args": [
         "-m",

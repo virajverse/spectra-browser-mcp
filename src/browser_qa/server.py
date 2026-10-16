@@ -827,7 +827,7 @@ def adapter_resolve(site: str, friendly_name: str, session_id: str = "default") 
 @mcp.tool()
 def browser_scroll_harvest(selector: str = "", target_count: int = 50, max_scrolls: int = 15, session_id: str = "default") -> Dict[str, Any]:
     """Scrolls until N items loaded (infinite scroll), then counts matches."""
-    return service.browser_scroll_harvest(selector, target_count, session_id)
+    return service.browser_scroll_harvest(selector, target_count, max_scrolls, session_id)
 
 
 # ==========================================

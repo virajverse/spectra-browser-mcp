@@ -509,6 +509,11 @@ def root_page(request: Request):
     })
 
 
+@app.get("/health")
+def health():
+    return {"status": "healthy", "service": "spectra-browser-openapi-bridge"}
+
+
 # Tolerance alias for Open WebUI which sometimes appends /openapi.json twice
 @app.get("/openapi.json/openapi.json")
 def openapi_double_alias():
